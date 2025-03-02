@@ -608,8 +608,30 @@
 			gap: 15px;
 		}
 		
+		.hero-content {
+			max-width: 100%;
+			padding: 0 15px;
+		}
+		
 		.hero h1 {
 			font-size: 2rem;
+			line-height: 1.3;
+		}
+		
+		.hero p {
+			font-size: 1rem;
+			margin-bottom: 25px;
+		}
+		
+		/* Fix button stacking */
+		.btn {
+			display: inline-block;
+			margin-bottom: 15px;
+		}
+		
+		.btn-outline {
+			margin-left: 0;
+			margin-top: 10px;
 		}
 		
 		.feature-card {
@@ -650,6 +672,16 @@
 			font-size: 0.8rem;
 			padding: 3px;
 		}
+		.hero h1 {
+			font-size: 1.8rem;
+		}
+		
+		/* Stack buttons vertically on very small screens */
+		.btn, .btn-outline {
+			display: block;
+			width: 100%;
+			text-align: center;
+		}		
 	}
     </style>
 </head>
