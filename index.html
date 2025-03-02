@@ -1232,7 +1232,10 @@
 			// D3.js Strain Tree Visualization
 			const width = document.getElementById('strain-tree').clientWidth;
 			const height = 350;
-			const margin = {top: 20, right: 90, bottom: 20, left: 90};
+			const isMobile = window.innerWidth <= 768;
+			const margin = isMobile 
+				? {top: 20, right: 20, bottom: 20, left: 20} 
+				: {top: 20, right: 90, bottom: 20, left: 90};
 			
 			// Clear any existing SVG
 			d3.select('#strain-tree').select('svg').remove();
@@ -1251,7 +1254,7 @@
 			// Prepare data
 			root = d3.hierarchy(strainData);
 			root.x0 = height / 2;
-			root.y0 = window.innerWidth <= 768 ? -70 : 0;
+			root.y0 = isMobile ? -100 : 0; // Shift the starting point on mobile
 			
 			// Collapse all nodes initially except the first level
 			if (root.children) {
@@ -1568,9 +1571,15 @@
 		
 		document.getElementById('collapse-all').addEventListener('click', function(e) {
 			e.preventDefault();
-			if (root && root.children) {
-				root.children.forEach(collapse);
-				update(root);
+			if (root) {
+				// First make sure all nodes are expanded
+				root.descendants().forEach(expand);
+				
+				// Then collapse direct children only
+				if (root.children) {
+					root.children.forEach(collapse);
+					update(root);
+				}
 			}
 		});
 		
