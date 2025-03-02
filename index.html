@@ -1572,13 +1572,12 @@
 		document.getElementById('collapse-all').addEventListener('click', function(e) {
 			e.preventDefault();
 			if (root) {
-				// First make sure all nodes are expanded
-				root.descendants().forEach(expand);
-				
-				// Then collapse direct children only
+				// Force collapse of the root node itself
 				if (root.children) {
-					root.children.forEach(collapse);
+					root._children = root.children;
+					root.children = null;
 					update(root);
+					console.log("Tree collapsed");
 				}
 			}
 		});
