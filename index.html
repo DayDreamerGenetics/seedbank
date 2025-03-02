@@ -1144,7 +1144,7 @@
 		// Updated fetchStrainData to use the backup data if remote fetch fails
 		async function fetchStrainData() {
 			try {
-				const response = await fetch('https://www.ai-ministries.com/daydreamer_strains.json');
+				const response = await fetch('daydreamer_strains.json');
 				
 				if (!response.ok) {
 					console.error(`Failed to fetch JSON: ${response.status}`);
@@ -1525,7 +1525,7 @@
 			strainCard.className = 'strain-card';
 			strainCard.innerHTML = `
 				<div class="strain-image">
-					<img src="${imageSrc}" alt="${strain.name}" onerror="this.src='images/placeholder-strain.jpg'">
+					<img src="${imageSrc}" alt="${strain.name}" onerror="this.src='img/placeholder-strain.jpg'">
 				</div>
 				<div class="strain-info">
 					<h3>${strain.name}</h3>
