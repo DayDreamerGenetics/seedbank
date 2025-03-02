@@ -1251,7 +1251,7 @@
 			// Prepare data
 			root = d3.hierarchy(strainData);
 			root.x0 = height / 2;
-			root.y0 = 0;
+			root.y0 = window.innerWidth <= 768 ? -70 : 0;
 			
 			// Collapse all nodes initially except the first level
 			if (root.children) {
