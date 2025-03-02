@@ -608,14 +608,6 @@
 			gap: 15px;
 		}
 		
-		nav ul {
-			justify-content: center;
-		}
-		
-		nav ul li {
-			margin: 0 10px;
-		}
-		
 		.hero h1 {
 			font-size: 2rem;
 		}
@@ -623,6 +615,40 @@
 		.feature-card {
 			max-width: 400px;
 			margin: 0 auto;
+		}
+		
+		/* Fix for navigation overflow */
+		nav ul {
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+		
+		nav ul li {
+			margin: 5px 8px;
+			white-space: nowrap;
+		}
+		
+		/* Reduce font size for navigation */
+		nav ul li a {
+			font-size: 0.9rem;
+		}
+		
+		/* Make sure container doesn't cause overflow */
+		.container {
+			width: 95%;
+			padding: 0 10px;
+		}
+	}
+
+	/* Add an even smaller breakpoint for very small devices */
+	@media (max-width: 480px) {
+		nav ul li {
+			margin: 3px 5px;
+		}
+		
+		nav ul li a {
+			font-size: 0.8rem;
+			padding: 3px;
 		}
 	}
     </style>
@@ -711,7 +737,7 @@
 						<option value="all">All Types</option>
 						<option value="indica-dominant">Indica</option>
 						<option value="sativa-dominant">Sativa</option>
-						<option value="balanced">Hybrid</option>
+						<option value="hybrid">Hybrid</option>
 					</select>
 				</div>
 			</div>
