@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DayDreamer Genetics - Cannabis Strain Visualizer</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2E7D32;
+            --secondary-color: #81C784;
+            --accent-color: #4CAF50;
+            --dark-color: #1B5E20;
+            --light-color: #C8E6C9;
+            --text-color: #212121;
+            --light-text: #FFFFFF;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #F9FFF9;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: var(--light-text);
+            text-align: center;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBmaWxsPSJyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMSkiIGQ9Ik01MCAwQzIyLjQgMCAwIDIyLjQgMCA1MEMwIDc3LjYgMjIuNCAxMDAgNTAgMTAwQzc3LjYgMTAwIDEwMCA3Ny42IDEwMCA1MEMxMDAgMjIuNCA3Ny42IDAgNTAgMFpNNTAgOTBDMjcuOSA5MCA5IDcyLjEgOSA1MEM5IDI3LjkgMjcuOSAxMCA1MCAxMEM3Mi4xIDEwIDkwIDI3LjkgOTAgNTBDOTAgNzIuMSA3Mi4xIDkwIDUwIDkwWiIvPjwvc3ZnPg==');
+            background-repeat: repeat;
+            opacity: 0.1;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chat-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-user {
+            align-items: flex-end;
+        }
+
+        .message-ai {
+            align-items: flex-start;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 0.8rem;
+            border-radius: 10px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-user .message-content {
+            background-color: var(--light-color);
+        }
+
+        .message-ai .message-content {
+            background-color: #f0f0f0;
+        }
+
+        .message-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .message-image:hover {
+            transform: scale(1.02);
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .chat-input input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .send-btn, .generate-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            margin-left: 0.5rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-btn:hover, .generate-btn:hover {
+            background-color: var(--dark-color);
+        }
+
+        .send-btn i, .generate-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .image-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .image-header {
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .image-display {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+            background-color: #f5f5f5;
+        }
+
+        .image-display img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .image-display.loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-color);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .image-controls {
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        .options-group {
+            margin-bottom: 1rem;
+        }
+
+        .options-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        .style-selector {
+            position: relative;
+        }
+
+        .style-selector select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            appearance: none;
+            background-color: white;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%232E7D32" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            cursor: pointer;
+        }
+
+        .style-selector select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
+        .style-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .style-tag {
+            background-color: var(--light-color);
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .style-tag .remove {
+            margin-left: 0.3rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .style-tag .remove:hover {
+            opacity: 1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            max-height: 90vh;
+            border-radius: 5px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            transform: scale(1.1);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: var(--light-text);
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Added styles */
+        .selected-styles {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .selected-styles h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background-color: #888;
+            border-radius: 50%;
+            display: inline-block;
+            opacity: 0.4;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation: blink 1s infinite 0.3s;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation: blink 1s infinite 0.5s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation: blink 1s infinite 0.7s;
+        }
+
+        @keyframes blink {
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">DayDreamer Genetics</div>
+        <div class="tagline">Visualize Your Dream Cannabis Strains</div>
+    </header>
+
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <i class="fas fa-comment-dots"></i>
+                <h2>Strain Designer AI</h2>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be added here -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Describe your dream cannabis strain...">
+                <button class="send-btn" id="sendBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    Chat
+                </button>
+                <button class="generate-btn" id="generateBtn">
+                    <i class="fas fa-magic"></i>
+                    Generate
+                </button>
+            </div>
+        </div>
+
+        <div class="image-container">
+            <div class="image-header">
+                <h2>Strain Visualization</h2>
+                <div id="downloadLink"></div>
+            </div>
+            <div class="image-display" id="imageDisplay">
+                <img id="currentImage" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cGF0aCBmaWxsPSIjRjVGNUY1IiBkPSJNMCAwaDI0MHYyNDBIMHoiLz48cGF0aCBmaWxsPSIjMkU3RDMyIiBkPSJNMTIwIDUwYzM4Ljg1IDAgNzAuNCA1MS42MiA3MC40IDg2LjY3IDAgMjkuMTQtMjMuNTUgNTIuNjktNTIuNjkgNTIuNjlIMTAyLjI5Yy0yOS4xNCAwLTUyLjY5LTIzLjU1LTUyLjY5LTUyLjY5QzQ5LjYgMTAxLjYyIDgxLjE1IDUwIDEyMCA1MHptMCAxNy44OGMtMTMuOTUgMC0zMC40OSAxNi45LTQzLjUzIDQyLjI3LTcuODEgMTUuMjUtMTAuOTkgMjkuODUtMTAuOTkgNDIuNzQgMCAyMS4xMyAxNy4xOCAzOC4zMiAzOC4zMiAzOC4zMkgxNDJjMjEuMTMgMCAzOC4zMi0xNy4xOCAzOC4zMi0zOC4zMiAwLTEyLjg4LTMuMTgtMjcuNDktMTAuOTktNDIuNzRDMTU2LjI5IDg0Ljc4IDEzMy45NSA2Ny44OCAxMjAgNjcuODh6Ii8+PHBhdGggZmlsbD0iIzgxQzc4NCIgZD0iTTEyMCA5Ni42M2M4LjM3IDAgMTUuMTYgNi43OSAxNS4xNiAxNS4xNnY4LjYyYzAgOC4zNy02Ljc5IDE1LjE2LTE1LjE2IDE1LjE2cy0xNS4xNi02Ljc5LTE1LjE2LTE1LjE2di04LjYyYzAtOC4zNyA2Ljc5LTE1LjE2IDE1LjE2LTE1LjE2eiIvPjxwYXRoIGZpbGw9IiM4MUM3ODQiIGQ9Ik0xNDUuNzkgMTIwYzAgOC4zNy02Ljc5IDE1LjE2LTE1LjE2IDE1LjE2aC04LjYyYy04LjM3IDAtMTUuMTYtNi43OS0xNS4xNi0xNS4xNnM2Ljc5LTE1LjE2IDE1LjE2LTE1LjE2aDguNjJjOC4zNyAwIDE1LjE2IDYuNzkgMTUuMTYgMTUuMTZ6Ii8+PHBhdGggZmlsbD0iIzgxQzc4NCIgZD0iTTEzNC4yNiAxMzQuMjZjNS45MiA1LjkyIDUuOTIgMTUuNTEgMCAyMS40M2wtNi4xIDYuMWMtNS45MiA1LjkyLTE1LjUxIDUuOTItMjEuNDMgMHMtNS45Mi0xNS41MSAwLTIxLjQzbDYuMS02LjFjNS45Mi01LjkyIDE1LjUxLTUuOTIgMjEuNDMgMHoiLz48cGF0aCBmaWxsPSIjODFDNzg0IiBkPSJNMTM0LjI2IDEwNS43NGMtNS45MiA1LjkyLTE1LjUxIDUuOTItMjEuNDMgMGwtNi4xLTYuMWMtNS45Mi01LjkyLTUuOTItMTUuNTEgMC0yMS40M3MxNS41MS01LjkyIDIxLjQzIDBsNi4xIDYuMWM1LjkyIDUuOTIgNS45MiAxNS41MSAwIDIxLjQzeiIvPjwvc3ZnPg==" alt="No image generated yet">
+            </div>
+            <div class="image-controls">
+                <div class="options-group">
+                    <label>Image Options</label>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="enhanceOption" checked>
+                        <label for="enhanceOption">Enhance (improve prompt quality)</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="privateOption" checked>
+                        <label for="privateOption">Private (don't share in public feed)</label>
+                    </div>
+                </div>
+                
+                <div class="options-group">
+                    <label for="styleSelector">Add Style</label>
+                    <div class="style-selector">
+                        <select id="styleSelector">
+                            <option value="">Select a style...</option>
+                            <!-- Styles will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="style-tags" id="styleTags">
+                        <!-- Selected styles will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="imageModal">
+        <div class="modal-close" id="modalClose">&times;</div>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Cannabis strain visualization">
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Main application logic
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const chatMessages = document.getElementById('chatMessages');
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const generateBtn = document.getElementById('generateBtn');
+            const imageDisplay = document.getElementById('imageDisplay');
+            const currentImage = document.getElementById('currentImage');
+            const enhanceOption = document.getElementById('enhanceOption');
+            const privateOption = document.getElementById('privateOption');
+            const styleSelector = document.getElementById('styleSelector');
+            const styleTags = document.getElementById('styleTags');
+            const imageModal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const modalClose = document.getElementById('modalClose');
+            const toast = document.getElementById('toast');
+            const downloadLink = document.getElementById('downloadLink');
+
+            // State management
+            let selectedStyles = [];
+            let currentPrompt = '';
+            let conversationHistory = [];
+            let isGenerating = false;
+
+            // Function to show toast notification
+            function showToast(message, duration = 3000) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
+
+            // Function to add message to chat
+            function addMessage(content, isUser, imageUrl = null) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = isUser ? 'message message-user' : 'message message-ai';
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.textContent = content;
+                messageDiv.appendChild(messageContent);
+                
+                if (imageUrl) {
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.alt = 'Generated cannabis strain';
+                    img.className = 'message-image';
+                    img.addEventListener('click', () => {
+                        openImageModal(imageUrl);
+                    });
+                    messageDiv.appendChild(img);
+                }
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Update conversation history
+                conversationHistory.push({
+                    role: isUser ? 'user' : 'assistant',
+                    content: content
+                });
+
+                // Limit history to last 10 messages
+                if (conversationHistory.length > 10) {
+                    conversationHistory = conversationHistory.slice(-10);
+                }
+            }
+
+            // Function to show typing indicator
+            function showTypingIndicator() {
+                const indicator = document.createElement('div');
+                indicator.className = 'typing-indicator';
+                indicator.id = 'typingIndicator';
+                indicator.innerHTML = '<span></span><span></span><span></span>';
+                chatMessages.appendChild(indicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Function to remove typing indicator
+            function removeTypingIndicator() {
+                const indicator = document.getElementById('typingIndicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
+
+            // Function to send message to AI
+            async function sendMessage(message, generateImage = false) {
+                if (!message.trim()) return;
+                
+                addMessage(message, true);
+                messageInput.value = '';
+                
+                if (generateImage) {
+                    generateImageFromPrompt(message);
+                    return;
+                }
+                
+                showTypingIndicator();
+                
+                try {
+                    // Create full messages array with system message first
+                    const messages = [
+						// Replace the existing system message with this:
+						{
+							role: 'system',
+							content: `You are a cannabis strain branding specialist for DayDreamer Genetics. 
+							Help users create strain names, labels, and marketing materials for their cannabis products.
+							When users mention parent strains or characteristics, suggest creative strain names that reflect the lineage and effects.
+							If asked, generate 5-10 name options with brief explanations of why each name fits.
+							Provide advice on branding, marketing copy, and label design for cannabis products.
+							When users select a name they like, encourage them to generate a label image.
+							Keep responses knowledgeable but concise, focusing on creative branding and marketing.`
+						},
+                        ...conversationHistory.slice(0, -1) // Exclude the message we just added
+                    ];
+                    
+                    // Send to Pollinations.AI Text API
+                    const response = await fetch('https://text.pollinations.ai/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            messages: messages,
+                            model: 'openai',
+                            private: true,
+                            jsonMode: false
+                        }),
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to get response from AI');
+                    }
+                    
+                    const data = await response.json();
+                    removeTypingIndicator();
+                    
+                    // Add AI response to chat
+                    const aiResponse = data.response || "I'm sorry, I couldn't process that request.";
+                    addMessage(aiResponse, false);
+                    
+                    // Check if we should suggest image generation
+                    if (message.toLowerCase().includes('generate') || 
+                        message.toLowerCase().includes('create') || 
+                        message.toLowerCase().includes('visualize') || 
+                        message.toLowerCase().includes('show me')) {
+						setTimeout(() => {
+							addMessage("Welcome to DayDreamer Genetics Strain Branding Assistant! I can help you create names, labels and brand identities for your cannabis strains. Share details about your strain's lineage, effects, or characteristics, and I'll suggest creative names. Once you've chosen a name, I can help generate a custom label image. How can I help with your strain branding today?", false);
+						}, 500);
+                    }
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    removeTypingIndicator();
+                    addMessage("I'm sorry, I encountered an error while processing your request. Please try again.", false);
+                }
+            }
+
+            // Function to generate image from prompt
+			async function generateImageFromPrompt(prompt) {
+				if (isGenerating) {
+					showToast("Already generating an image, please wait...");
+					return;
+				}
+				
+				isGenerating = true;
+				imageDisplay.classList.add('loading');
+				currentPrompt = prompt;
+				
+				// Add styles to prompt if selected
+				let fullPrompt = prompt;
+				if (selectedStyles.length > 0) {
+					const styleText = selectedStyles.map(style => style.value).join(', ');
+					fullPrompt = `${prompt}, ${styleText}`;
+				}
+				
+				// Enhance the prompt to create label-like imagery if not specified
+				if (!fullPrompt.toLowerCase().includes('label') && 
+					!fullPrompt.toLowerCase().includes('logo') && 
+					!fullPrompt.toLowerCase().includes('packaging')) {
+					fullPrompt = `Professional cannabis strain label design for "${fullPrompt}", product packaging, high quality, commercial, elegant design, strain name clearly visible`;
+				}
+				
+				// Create the image URL with parameters
+				const encodedPrompt = encodeURIComponent(fullPrompt);
+				const enhanceParam = enhanceOption.checked ? '&enhance=true' : '';
+				const privateParam = privateOption.checked ? '&private=true' : '';
+				const modelParam = '&model=flux';
+				const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true${enhanceParam}${privateParam}${modelParam}&width=512&height=512&seed=${Math.floor(Math.random() * 1000000)}`;
+				
+				try {
+					// Simulate fetching the image (actual fetch happens when img.src is set)
+					showToast("Generating your cannabis strain label...");
+					
+					// Create new image element and set up load/error handlers
+					const img = new Image();
+					
+					img.onload = function() {
+						// Update the current image and display
+						currentImage.src = imageUrl;
+						currentImage.alt = fullPrompt;
+						
+						// Add the image to the chat
+						addMessage(`I've generated a label design based on: "${prompt}"`, false, imageUrl);
+						
+						// Add download link
+						downloadLink.innerHTML = `<a href="${imageUrl}" download="daydreamer_strain_label.jpg" style="color: white;"><i class="fas fa-download"></i></a>`;
+						
+						// Cleanup
+						imageDisplay.classList.remove('loading');
+						isGenerating = false;
+					};
+					
+					img.onerror = function() {
+						showToast("Failed to generate label. Please try a different description.");
+						imageDisplay.classList.remove('loading');
+						isGenerating = false;
+					};
+					
+					// Start loading the image
+					img.src = imageUrl;
+					
+				} catch (error) {
+					console.error('Error generating image:', error);
+					showToast("Error generating label. Please try again.");
+					imageDisplay.classList.remove('loading');
+					isGenerating = false;
+				}
+			}
+
+            // Function to open image modal
+            function openImageModal(imageUrl) {
+                modalImage.src = imageUrl;
+                imageModal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling
+            }
+
+            // Function to close image modal
+            function closeImageModal() {
+                imageModal.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+
+            // Function to add style to selected styles
+            function addStyle(styleText, styleValue) {
+                if (!styleValue || selectedStyles.some(s => s.value === styleValue)) {
+                    return; // Don't add empty or duplicate styles
+                }
+                
+                const style = { text: styleText, value: styleValue };
+                selectedStyles.push(style);
+                
+                // Create tag element
+                const tagEl = document.createElement('div');
+                tagEl.className = 'style-tag';
+                tagEl.innerHTML = `
+                    ${styleText}
+                    <span class="remove" data-value="${styleValue}">&times;</span>
+                `;
+                styleTags.appendChild(tagEl);
+                
+                // Reset selector
+                styleSelector.value = '';
+            }
+
+            // Function to remove style from selected styles
+            function removeStyle(styleValue) {
+                selectedStyles = selectedStyles.filter(s => s.value !== styleValue);
+                
+                // Remove from DOM
+                const tags = styleTags.querySelectorAll('.style-tag');
+                tags.forEach(tag => {
+                    const removeBtn = tag.querySelector('.remove');
+                    if (removeBtn.getAttribute('data-value') === styleValue) {
+                        tag.remove();
+                    }
+                });
+            }
+
+            // Function to populate style selector
+            function populateStyleSelector() {
+                // An abbreviated list of styles - you can expand this with more from your provided list
+                const styles = [
+                    { text: "Anime", value: "anime:1.3, line drawing, asian influence, vibrant colors, cel shading, large expressive eyes, detailed hair, dynamic poses" },
+                    { text: "Art Deco", value: "art deco, geometric shapes, rich colors, lavish ornamentation, luxorious, symmetry, detailed, elegant" },
+                    { text: "Cyberpunk", value: "cyberpunk, futuristic, neon colors, dark atmosphere, highly detailed, neon lights, urban, dystopian, high-tech" },
+                    { text: "Digital Painting", value: "digital painting, smooth gradients, vibrant colors, highly detailed" },
+                    { text: "Fantasy Art", value: "fantasy art, imaginative, vibrant colors, mythical creatures, detailed, epic, magical, dynamic, mythical, highly detailed" },
+                    { text: "Hyperrealism", value: "hyperrealism, extremely detailed, lifelike, photographic, high contrast, textures, meticulous, natural colors, precise" },
+                    { text: "Nature Art", value: "nature art, natural elements, organic, detailed, highly detailed" },
+                    { text: "Photorealism", value: "photorealism, extremely detailed, lifelike, high contrast, textures, meticulous, realistic" },
+                    { text: "Pop Art", value: "pop art, bold colors, commercial imagery, comic strip style, repetition, detailed, vibrant" },
+                    { text: "Psychedelic Art", value: "psychedelic art, vibrant colors, abstract, trippy, highly detailed, imaginative" },
+                    { text: "Surrealism", value: "surrealism, dream-like, bizarre, abstract, fantastical, juxtapositions, detailed, strange, whimsical" },
+                    { text: "Vaporwave", value: "vaporwave, 80s aesthetic, neon colors, glitch art, nostalgic, surreal, detailed, retro" },
+                    { text: "Watercolor", value: "watercolor painting, soft edges, pastel colors, natural textures, highly detailed" }
+					{ text: "Minimalist", value: "minimalist design, clean, elegant, simple, modern packaging" },
+					{ text: "Luxury", value: "luxury packaging, premium, gold accents, high-end, sophisticated design" },
+					{ text: "Vintage", value: "vintage label, retro packaging, classic design, nostalgic, aged paper texture" },
+					{ text: "Medical", value: "medical cannabis packaging, pharmaceutical style, clinical, professional, health-focused" },
+					{ text: "Organic", value: "organic product packaging, natural elements, eco-friendly, plant motifs, earth tones" },
+					{ text: "Psychedelic", value: "psychedelic art, vibrant colors, trippy, abstract patterns, 60s inspired" },
+					{ text: "Hipster", value: "hipster design, artisanal, handcrafted look, indie aesthetic, craft cannabis" },
+					{ text: "Corporate", value: "corporate branding, professional, clean lines, business-like, corporate identity" },
+					{ text: "Illustrated", value: "hand-drawn illustration, artistic, detailed artwork, creative, unique illustration" },
+					{ text: "Holographic", value: "holographic elements, iridescent, futuristic, shimmering effect, modern" }
+				];
+                
+                // Add options to select
+                styles.forEach(style => {
+                    const option = document.createElement('option');
+                    option.value = style.value;
+                    option.textContent = style.text;
+                    styleSelector.appendChild(option);
+                });
+            }
+
+            // Function to list all available styles
+            function listStyles() {
+                addMessage("Here are some styles you can use for your cannabis strain images:", false);
+                
+                // Get all options from the style selector
+                const options = Array.from(styleSelector.options).slice(1); // Skip the first "Select a style" option
+                
+                // Create message with style list
+                let styleList = options.map(option => option.textContent).join(", ");
+                addMessage(`Available styles: ${styleList}`, false);
+                addMessage("To use a style, select it from the dropdown menu or ask me to use a specific style when generating an image.", false);
+            }
+
+            // Event Listeners
+            sendBtn.addEventListener('click', () => {
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendMessage(message, false);
+                }
+            });
+
+            generateBtn.addEventListener('click', () => {
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendMessage(message, true);
+                } else if (currentPrompt) {
+                    // If there's no new prompt but there is a current one, regenerate
+                    generateImageFromPrompt(currentPrompt);
+                } else {
+                    showToast("Please enter a description first.");
+                }
+            });
+
+            messageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendBtn.click();
+                }
+            });
+
+            // Style selector events
+            styleSelector.addEventListener('change', () => {
+                const selectedOption = styleSelector.options[styleSelector.selectedIndex];
+                if (selectedOption.value) {
+                    addStyle(selectedOption.textContent, selectedOption.value);
+                }
+            });
+
+            // Event delegation for style tag removal
+            styleTags.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove')) {
+                    const styleValue = e.target.getAttribute('data-value');
+                    removeStyle(styleValue);
+                }
+            });
+
+            // Modal events
+            currentImage.addEventListener('click', () => {
+                if (currentImage.src && !currentImage.src.includes('data:image/svg+xml')) {
+                    openImageModal(currentImage.src);
+                }
+            });
+
+            modalClose.addEventListener('click', closeImageModal);
+            imageModal.addEventListener('click', (e) => {
+                if (e.target === imageModal) {
+                    closeImageModal();
+                }
+            });
+
+            // Initialize
+            populateStyleSelector();
+            
+            // Add welcome message
+            setTimeout(() => {
+                addMessage("Welcome to DayDreamer Genetics! I'm your cannabis strain design assistant. Describe your dream strain, and I can help visualize it for you. What kind of cannabis strain would you like to create today?", false);
+            }, 500);
+
+            // Add command listener for listing styles
+            messageInput.addEventListener('input', () => {
+                const value = messageInput.value.toLowerCase();
+                if (value === '/styles' || value === '/list styles') {
+                    messageInput.value = '';
+                    listStyles();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
