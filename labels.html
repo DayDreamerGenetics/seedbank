@@ -616,78 +616,79 @@
                 }
             }
 
-            // Function to send message to AI
-            async function sendMessage(message, generateImage = false) {
-                if (!message.trim()) return;
-                
-                addMessage(message, true);
-                messageInput.value = '';
-                
-                if (generateImage) {
-                    generateImageFromPrompt(message);
-                    return;
-                }
-                
-                showTypingIndicator();
-                
-                try {
-                    // Create full messages array with system message first
-                    const messages = [
-						// Replace the existing system message with this:
-						{
-							role: 'system',
-							content: `You are a cannabis strain branding specialist for DayDreamer Genetics. 
-							Help users create strain names, labels, and marketing materials for their cannabis products.
-							When users mention parent strains or characteristics, suggest creative strain names that reflect the lineage and effects.
-							If asked, generate 5-10 name options with brief explanations of why each name fits.
-							Provide advice on branding, marketing copy, and label design for cannabis products.
-							When users select a name they like, encourage them to generate a label image.
-							Keep responses knowledgeable but concise, focusing on creative branding and marketing.`
+			// Function to send message to AI
+			async function sendMessage(message, generateImage = false) {
+				if (!message.trim()) return;
+				
+				addMessage(message, true);
+				messageInput.value = '';
+				
+				if (generateImage) {
+					generateImageFromPrompt(message);
+					return;
+				}
+				
+				showTypingIndicator();
+				
+				try {
+					// Create properly formatted messages array
+					const systemMessage = {
+						role: 'system',
+						content: `You are a cannabis strain branding specialist for DayDreamer Genetics. 
+						Help users create strain names, labels, and marketing materials for their cannabis products.
+						When users mention parent strains or characteristics, suggest creative strain names that reflect the lineage and effects.
+						If asked, generate 5-10 name options with brief explanations of why each name fits.
+						Provide advice on branding, marketing copy, and label design for cannabis products.
+						When users select a name they like, encourage them to generate a label image.
+						Keep responses knowledgeable but concise, focusing on creative branding and marketing.`
+					};
+					
+					// Send all conversation history with proper roles
+					const messages = [
+						systemMessage,
+						...conversationHistory
+					];
+					
+					// Keep history manageable (last 20 messages - 10 user, 10 assistant)
+					if (messages.length > 21) { // 1 system + 20 conversation messages
+						messages.splice(1, messages.length - 21); // Remove oldest messages but keep system message
+					}
+					
+					// Generate random seed for variety in responses
+					const randomSeed = Math.floor(Math.random() * 1000000);
+					
+					// Send to Pollinations.AI Text API
+					const response = await fetch('https://text.pollinations.ai/', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
 						},
-                        ...conversationHistory.slice(0, -1) // Exclude the message we just added
-                    ];
-                    
-                    // Send to Pollinations.AI Text API
-                    const response = await fetch('https://text.pollinations.ai/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            messages: messages,
-                            model: 'openai',
-                            private: true,
-                            jsonMode: false
-                        }),
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error('Failed to get response from AI');
-                    }
-                    
-                    const data = await response.json();
-                    removeTypingIndicator();
-                    
-                    // Add AI response to chat
-                    const aiResponse = data.response || "I'm sorry, I couldn't process that request.";
-                    addMessage(aiResponse, false);
-                    
-                    // Check if we should suggest image generation
-                    if (message.toLowerCase().includes('generate') || 
-                        message.toLowerCase().includes('create') || 
-                        message.toLowerCase().includes('visualize') || 
-                        message.toLowerCase().includes('show me')) {						
-						setTimeout(() => {
-							addMessage("Welcome to DayDreamer Genetics! I'm your cannabis strain branding assistant. I can help you create names, marketing materials, and label designs for your cannabis products. Describe your strain's lineage, effects, or the vibe you're going for, and we'll get started!", false);
-						}, 500);
-                    }
-                    
-                } catch (error) {
-                    console.error('Error:', error);
-                    removeTypingIndicator();
-                    addMessage("I'm sorry, I encountered an error while processing your request. Please try again.", false);
-                }
-            }
+						body: JSON.stringify({
+							messages: messages,
+							model: 'openai',
+							private: true,
+							jsonMode: false,
+							seed: randomSeed
+						}),
+					});
+					
+					if (!response.ok) {
+						throw new Error('Failed to get response from AI');
+					}
+					
+					// Direct text handling - no JSON parsing
+					const responseText = await response.text();
+					removeTypingIndicator();
+					
+					// Add AI response to chat
+					addMessage(responseText, false);
+					
+				} catch (error) {
+					console.error('Error:', error);
+					removeTypingIndicator();
+					addMessage("I'm sorry, I encountered an error while processing your request. Please try again.", false);
+				}
+			}
 
             // Function to generate image from prompt
 			async function generateImageFromPrompt(prompt) {
