@@ -544,7 +544,15 @@
 
     <script>
         // Main application logic
-        document.addEventListener('DOMContentLoaded', function() {
+		console.log("Script tag encountered at", new Date().toISOString());
+        document.addEventListener('DOMContentLoaded', function() { 
+			console.log("DOMContentLoaded fired at", new Date().toISOString());
+			// Check if already initialized
+			if (hasInitialized) {
+				console.log("Preventing duplicate initialization");
+				return;
+			}
+			hasInitialized = true;
             // DOM Elements
             const chatMessages = document.getElementById('chatMessages');
             const messageInput = document.getElementById('messageInput');
