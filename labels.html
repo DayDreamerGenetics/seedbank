@@ -65,14 +65,57 @@
             opacity: 0.9;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
+		.container {
+			max-width: 1200px;
+			margin: 1rem auto; /* Reduced from 2rem */
+			padding: 0 1rem;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1.5rem; /* Reduced from 2rem */
+		}
+
+		.chat-container, .image-container {
+			height: 650px; /* Increased from 600px */
+		}
+
+		.image-display {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0.5rem; /* Reduced from 1rem */
+			position: relative;
+			overflow: hidden;
+			background-color: #f5f5f5;
+		}
+
+		.image-controls {
+			padding: 0.75rem; /* Reduced from 1rem */
+			background-color: #f9f9f9;
+			border-top: 1px solid #eee;
+		}
+
+		.options-group {
+			margin-bottom: 0.75rem; /* Reduced from 1rem */
+		}
+
+		header {
+			padding: 1rem 0; /* Reduced from 1.5rem */
+		}
+
+		/* Compact the options to save space */
+		.checkbox-option {
+			margin-bottom: 0.25rem; /* Reduced from 0.5rem */
+		}
+
+		/* Make the image display larger within container */
+		.image-display img {
+			max-width: 100%;
+			max-height: 100%;
+			object-fit: contain; /* Ensures the full image is visible */
+			border-radius: 8px;
+			box-shadow: var(--shadow);
+		}
 
         @media (max-width: 768px) {
             .container {
@@ -759,7 +802,7 @@
 				}
 			}
 
-            // Function to generate image from prompt
+			// Function to generate image from prompt
 			async function generateImageFromPrompt(prompt) {
 				if (isGenerating) {
 					showToast("Already generating a label, please wait...");
@@ -768,31 +811,56 @@
 				
 				isGenerating = true;
 				imageDisplay.classList.add('loading');
-				currentPrompt = prompt;
 				
-				// Add styles to prompt if selected
-				let fullPrompt = prompt;
-				if (selectedStyles.length > 0) {
-					const styleText = selectedStyles.map(style => style.value).join(', ');
-					fullPrompt = `${prompt}, ${styleText}`;
+				// Extract strain name from conversation or prompt
+				let strainName = "";
+				// Look for strain name in recent conversation
+				for (let i = conversationHistory.length - 1; i >= 0; i--) {
+					const msg = conversationHistory[i].content;
+					// Check for quoted names or numbered lists with names
+					const nameMatch = msg.match(/["']([^"']+)["']/) || 
+									 msg.match(/\d+\.\s+([A-Za-z\s]+)/) ||
+									 msg.match(/\*\*([A-Za-z\s]+)\*\*/);
+					if (nameMatch && nameMatch[1]) {
+						strainName = nameMatch[1].trim();
+						break;
+					}
 				}
 				
-				// Enhance the prompt to create label-like imagery if not specified
-				if (!fullPrompt.toLowerCase().includes('label') && 
-					!fullPrompt.toLowerCase().includes('logo') && 
-					!fullPrompt.toLowerCase().includes('packaging')) {
-					fullPrompt = `Professional cannabis strain label design for "${fullPrompt}", product packaging, high quality, commercial, elegant design, strain name clearly visible`;
+				// If no strain name found, check the current prompt
+				if (!strainName) {
+					const nameFromPrompt = prompt.match(/["']([^"']+)["']/) || prompt.match(/name\s+["']?([^"']+)["']?/i);
+					if (nameFromPrompt && nameFromPrompt[1]) {
+						strainName = nameFromPrompt[1].trim();
+					}
+				}
+				
+				// Store current prompt
+				currentPrompt = prompt;
+				
+				// Create a more specific prompt focused on label quality
+				let enhancedPrompt = "";
+				if (strainName) {
+					enhancedPrompt = `Professional cannabis product label design with text "${strainName}" prominently displayed as the strain name, premium packaging, clear typography, high quality product photo, commercial cannabis branding, elegant strain label design`;
+				} else {
+					enhancedPrompt = `Professional cannabis strain label design based on: "${prompt}", product packaging, strain name clearly visible, premium quality label, commercial cannabis branding`;
+				}
+				
+				// Add styles to prompt if selected
+				if (selectedStyles.length > 0) {
+					const styleText = selectedStyles.map(style => style.value).join(', ');
+					enhancedPrompt += `, ${styleText}`;
 				}
 				
 				// Create the image URL with parameters
-				const encodedPrompt = encodeURIComponent(fullPrompt);
+				const encodedPrompt = encodeURIComponent(enhancedPrompt);
 				const enhanceParam = enhanceOption.checked ? '&enhance=true' : '';
 				const privateParam = privateOption.checked ? '&private=true' : '';
 				const modelParam = '&model=flux';
 				const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true${enhanceParam}${privateParam}${modelParam}&width=512&height=512&seed=${Math.floor(Math.random() * 1000000)}`;
 				
 				try {
-					showToast("Generating your cannabis strain label...");
+					showToast("Generating your cannabis strain label" + (strainName ? ` for "${strainName}"` : "") + "...");
 					
 					// Create new image element and set up load/error handlers
 					const img = new Image();
@@ -800,13 +868,19 @@
 					img.onload = function() {
 						// Update the current image and display
 						currentImage.src = imageUrl;
-						currentImage.alt = fullPrompt;
+						currentImage.alt = strainName || prompt;
 						
 						// Add the image to the chat
-						addMessage(`I've generated a label design based on: "${prompt}"`, false, imageUrl);
+						const messageText = strainName ? 
+							`I've generated a label design for "${strainName}"` : 
+							`I've generated a label design based on your description`;
+						addMessage(messageText, false, imageUrl);
 						
 						// Add download link
-						downloadLink.innerHTML = `<a href="${imageUrl}" download="daydreamer_strain_label.jpg" style="color: white;"><i class="fas fa-download"></i></a>`;
+						const fileName = strainName ? 
+							`daydreamer_${strainName.toLowerCase().replace(/\s+/g, '_')}.jpg` : 
+							'daydreamer_strain_label.jpg';
+						downloadLink.innerHTML = `<a href="${imageUrl}" download="${fileName}" style="color: white;"><i class="fas fa-download"></i></a>`;
 						
 						// Cleanup
 						imageDisplay.classList.remove('loading');
