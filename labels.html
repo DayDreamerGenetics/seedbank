@@ -567,7 +567,8 @@
             let currentPrompt = '';
             let conversationHistory = [];
             let isGenerating = false;
-
+			let hasInitialized = false;
+			
             // Function to show toast notification
             function showToast(message, duration = 3000) {
                 toast.textContent = message;
@@ -1078,14 +1079,6 @@
                 addMessage("Welcome to DayDreamer Genetics! I'm your cannabis strain design assistant. Describe your dream strain, and I can help visualize it for you. What kind of cannabis strain would you like to create today?", false);
             }, 500);
 
-            // Add command listener for listing styles
-            messageInput.addEventListener('input', () => {
-                const value = messageInput.value.toLowerCase();
-                if (value === '/styles' || value === '/list styles') {
-                    messageInput.value = '';
-                    listStyles();
-                }
-            });
         });
     </script>
 </body>
