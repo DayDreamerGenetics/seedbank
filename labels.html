@@ -839,7 +839,6 @@
 				}
 			}
 
-			// Function to generate image from prompt with better error handling
 			async function generateImageFromPrompt(prompt) {
 				if (isGenerating) {
 					showToast("Already generating a label, please wait...");
@@ -865,32 +864,32 @@
 				try {
 					showToast("Generating your cannabis strain label...");
 					
-					// Create new image element with proper error handling
+					// Create an Image element and set up onload/onerror handlers
 					const img = new Image();
 					
-					// Set up promise-based image loading
-					const imageLoaded = new Promise((resolve, reject) => {
-						img.onload = resolve;
-						img.onerror = reject;
+					// Set up a Promise to handle image loading
+					const imageLoadPromise = new Promise((resolve, reject) => {
+						img.onload = () => resolve(img);
+						img.onerror = (e) => reject(new Error("Failed to load image"));
 						
-						// Add timeout to prevent hanging on image load
+						// Set a timeout in case the image takes too long to load
 						setTimeout(() => reject(new Error("Image generation timed out")), 30000);
 					});
 					
 					// Start loading the image
 					img.src = imageUrl;
 					
-					// Wait for image to load or error
-					await imageLoaded;
+					// Wait for the image to load
+					await imageLoadPromise;
 					
-					// Success - update the UI
+					// Success! Update the UI with the new image
 					currentImage.src = imageUrl;
 					currentImage.alt = "Cannabis strain label";
 					
-					// Add text notification to chat but NOT the image itself
+					// Add text notification to chat
 					addMessage("Your label design has been generated in the display area.", false);
 					
-					// Add to conversation history (only the notification, not the image)
+					// Add to conversation history
 					conversationHistory.push({
 						role: 'assistant',
 						content: "Your label design has been generated in the display area."
