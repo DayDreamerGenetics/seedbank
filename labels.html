@@ -674,24 +674,36 @@
 					return;
 				}
 				
-				// Add user message to chat
+				// Add user message to chat ONLY ONCE
 				if (message.trim()) {
 					addMessage(message, true);
 					messageInput.value = '';
+					
+					// Store message in a variable to prevent re-adding
+					const userMessage = message;
+					message = '';  // Clear message to prevent duplicate sending
 				}
 				
 				// If generate button clicked with input, use input directly
 				if (generateImage) {
-					generateImageFromPrompt(message);
+					generateImageFromPrompt(userMessage || message);
 					return;
 				}
 				
+				// Show typing indicator before API call
 				showTypingIndicator();
 				
+				// Prevent multiple simultaneous requests
+				if (isGenerating) {
+					showToast("Already processing a message, please wait...");
+					removeTypingIndicator();
+					return;
+				}
+				
+				isGenerating = true;
+				
 				try {
-					// Create system message (defined above)
-					
-					// Build message history - IMPORTANT: limit to last 5 exchanges to avoid context issues
+					// Build message history - limit to last 10 exchanges
 					const recentHistory = conversationHistory.slice(-10);
 					
 					const messages = [
@@ -699,9 +711,7 @@
 						...recentHistory
 					];
 					
-					console.log("Sending messages to AI:", JSON.stringify(messages)); // Debug log
-					
-					// Send to Pollinations.AI Text API
+					// Send to API
 					const response = await fetch('https://text.pollinations.ai/', {
 						method: 'POST',
 						headers: {
@@ -714,7 +724,6 @@
 							jsonMode: false,
 							seed: Math.floor(Math.random() * 1000000)
 						}),
-						// Add timeout to prevent hanging requests
 						signal: AbortSignal.timeout(15000) // 15 second timeout
 					});
 					
@@ -725,41 +734,35 @@
 					const responseText = await response.text();
 					removeTypingIndicator();
 					
-					console.log("AI Response:", responseText); // Debug log
-					
-					// Check for GENERATE_IMAGE command - use a clear regex pattern
+					// Check for GENERATE_IMAGE command
 					const imageMatch = responseText.match(/GENERATE_IMAGE:\s*(.*?)(?:$|(?=\n\n))/s);
 					
 					if (imageMatch && imageMatch[1]) {
-						// Extract just the image description
+						// Extract image description
 						const imagePrompt = imageMatch[1].trim();
 						
 						// Store for reuse
 						currentPrompt = imagePrompt;
 						
-						// Clean the response by removing the command
+						// Clean the response
 						let cleanResponse = responseText.replace(/GENERATE_IMAGE:\s*(.*?)(?:$|(?=\n\n))/s, '').trim();
 						
-						// If nothing left after removing command, use a generic message
 						if (!cleanResponse) {
 							cleanResponse = "Generating your strain label...";
 						}
 						
-						// Add to chat history
+						// Add to chat
 						addMessage(cleanResponse, false);
 						
 						// Add to conversation history
 						conversationHistory.push({
 							role: 'assistant',
-							content: responseText // Keep the full response for context
+							content: responseText // Keep full response for context
 						});
 						
-						// Prevent multiple simultaneous image generations
-						if (!isGenerating) {
-							generateImageFromPrompt(imagePrompt);
-						}
+						generateImageFromPrompt(imagePrompt);
 					} else {
-						// No image command found, just add the response
+						// No image command found
 						addMessage(responseText, false);
 						
 						// Add to conversation history
@@ -779,11 +782,15 @@
 						console.log(`Retrying in ${delay/1000} seconds...`);
 						
 						setTimeout(() => {
-							sendMessage(message, generateImage, retryCount + 1);
+							// Don't re-add the user message on retry
+							const retryMessage = '';
+							sendMessage(retryMessage, generateImage, retryCount + 1);
 						}, delay);
 					} else {
 						addMessage("I'm sorry, I encountered an error connecting to the AI service. Please try again in a moment.", false);
 					}
+				} finally {
+					isGenerating = false;
 				}
 			}
 
