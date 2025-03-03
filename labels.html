@@ -545,12 +545,14 @@
     <script>
         // Main application logic
 		console.log("Script tag encountered at", new Date().toISOString());
-		
-		hasInitialized = false;
 					
-        document.addEventListener('DOMContentLoaded', function() { 
+		document.addEventListener('DOMContentLoaded', function() { 
 			console.log("DOMContentLoaded fired at", new Date().toISOString());
-			// Check if already initialized
+			
+			// Define hasInitialized at the top of your function
+			let hasInitialized = false;
+			
+			// Now check if already initialized
 			console.log("DOMContentLoaded fired at", new Date().toISOString());
 			if (hasInitialized) {
 				console.log("Preventing duplicate initialization");
