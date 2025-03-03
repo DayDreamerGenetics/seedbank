@@ -722,11 +722,33 @@
 					addMessage(responseText, false);
 					
 					// Check if user was asking for an image or visualization
-					const imageKeywords = ['image', 'picture', 'visual', 'visualize', 'show me', 'generate', 'create', 'label'];
-					if (imageKeywords.some(keyword => message.toLowerCase().includes(keyword)) && !generateImage) {
-						// Extract details from user message for image generation
+					const userRequestsImage = ['image', 'picture', 'visual', 'visualize', 'show me', 'generate', 'create', 'label']
+						.some(keyword => message.toLowerCase().includes(keyword));
+					
+					// Check if AI response mentions generating an image
+					const aiOffersImage = responseText.toLowerCase().includes('generate an image') || 
+										 responseText.toLowerCase().includes('generate a label') ||
+										 responseText.toLowerCase().includes('generate image') ||
+										 responseText.toLowerCase().includes('would you like to see') ||
+										 responseText.toLowerCase().includes('would you like me to generate') ||
+										 responseText.toLowerCase().includes('i can create a label');
+					
+					// Extract strain name if it exists in AI response
+					let strainName = "";
+					const nameMatch = responseText.match(/\*\*(.*?)\*\*/);
+					if (nameMatch && nameMatch[1]) {
+						strainName = nameMatch[1];
+					}
+					
+					// Generate image if user requested or AI offered
+					if ((userRequestsImage || aiOffersImage) && !generateImage) {
+						// Use strain name if found, otherwise use user message
+						const imagePrompt = strainName ? 
+							`${strainName} cannabis strain label` : 
+							`${message} cannabis strain label`;
+						
 						setTimeout(() => {
-							generateImageFromPrompt(message);
+							generateImageFromPrompt(imagePrompt);
 						}, 800);
 					}
 					
