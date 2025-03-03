@@ -704,6 +704,9 @@
 
 			// Function to send message to AI with better error handling
 			async function sendMessage(message, generateImage = false, retryCount = 0) {
+				// Define userMessage at function level so it's available everywhere in the function
+				let userMessage = '';
+				
 				if (!message.trim() && !generateImage) return;
 				
 				// If generate button clicked with no input, reuse last prompt
@@ -722,7 +725,7 @@
 					messageInput.value = '';
 					
 					// Store message in a variable to prevent re-adding
-					const userMessage = message;
+					userMessage = message;
 					message = '';  // Clear message to prevent duplicate sending
 				}
 				
