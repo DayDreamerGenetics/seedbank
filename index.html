@@ -315,7 +315,7 @@
 
 	.strain-grid {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(2, 1fr); /* 2 columns for desktop */
 		gap: 25px;
 	}
 
@@ -626,7 +626,11 @@
 			flex-direction: column;
 			gap: 15px;
 		}
-		
+
+		.strain-grid {
+			grid-template-columns: 1fr; /* 1 column for mobile */
+		}
+	
 		.hero-content {
 			max-width: 100%;
 			padding: 0 15px;
