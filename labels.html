@@ -682,9 +682,11 @@
 						KEEP ALL RESPONSES BRIEF AND TO THE POINT.
 						When users describe strain characteristics:
 						- Provide a simple list of 5-7 creative name options (no long explanations)
-						- IMMEDIATELY offer to generate a label image
-						If the user mentions wanting an image or visualization, tell them you're generating an image and then actually do it.
-						Your main purpose is to help brand and visualize cannabis products efficiently.`
+						- IMMEDIATELY OFFER to generate an image and wait for the response or, 
+						If the user mentions wanting an image or visualization, actually do it,
+						while including the strain name in the image prompt description clearly.
+						Your purpose is to brand and visualize cannabis concepts efficiently by rendering an image.
+						Keep all image prompts visually descriptive and include styles to suit the theme and style needed.`
 					};
 					
 					// Send all conversation history with proper roles
@@ -709,7 +711,7 @@
 						},
 						body: JSON.stringify({
 							messages: messages,
-							model: 'openai',
+							model: 'openai-large',
 							private: true,
 							jsonMode: false,
 							seed: randomSeed
