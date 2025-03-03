@@ -157,14 +157,21 @@
             border-top: 1px solid #eee;
         }
 
-        .chat-input input {
-            flex: 1;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            outline: none;
-            transition: var(--transition);
-        }
+		.chat-input input {
+			flex: 1;
+			padding: 0.8rem;
+			border: 1px solid #ddd;
+			border-radius: 20px;
+			outline: none;
+			transition: var(--transition);
+			font-size: 1rem; /* Increased font size */
+			min-height: 44px; /* Minimum height for better touch targets */
+		}
+
+		.chat-input input::placeholder {
+			color: #888;
+			font-size: 0.9rem;
+		}
 
         .chat-input input:focus {
             border-color: var(--accent-color);
@@ -448,20 +455,20 @@
 <body>
     <header>
         <div class="logo">DayDreamer Genetics</div>
-        <div class="tagline">Visualize Your Dream Cannabis Strains</div>
+        <div class="tagline">Cannabis Strain Branding Assistant</div>
     </header>
 
     <div class="container">
         <div class="chat-container">
-            <div class="chat-header">
-                <i class="fas fa-comment-dots"></i>
-                <h2>Strain Designer AI</h2>
-            </div>
+			<div class="chat-header">
+				<i class="fas fa-comment-dots"></i>
+				<h2>Strain Branding AI</h2>
+			</div>
             <div class="chat-messages" id="chatMessages">
                 <!-- Messages will be added here -->
             </div>
             <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Describe your dream cannabis strain...">
+                <input type="text" id="messageInput" placeholder="Describe your strain's effects, lineage, or desired vibe...">
                 <button class="send-btn" id="sendBtn">
                     <i class="fas fa-paper-plane"></i>
                     Chat
@@ -474,12 +481,13 @@
         </div>
 
         <div class="image-container">
-            <div class="image-header">
-                <h2>Strain Visualization</h2>
-                <div id="downloadLink"></div>
-            </div>
+			<div class="image-header">
+				<h2>Label Designer</h2>
+				<div id="downloadLink"></div>
+			</div>
             <div class="image-display" id="imageDisplay">
-                <img id="currentImage" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNDAgMjQwIj48cGF0aCBmaWxsPSIjRjVGNUY1IiBkPSJNMCAwaDI0MHYyNDBIMHoiLz48cGF0aCBmaWxsPSIjMkU3RDMyIiBkPSJNMTIwIDUwYzM4Ljg1IDAgNzAuNCA1MS42MiA3MC40IDg2LjY3IDAgMjkuMTQtMjMuNTUgNTIuNjktNTIuNjkgNTIuNjlIMTAyLjI5Yy0yOS4xNCAwLTUyLjY5LTIzLjU1LTUyLjY5LTUyLjY5QzQ5LjYgMTAxLjYyIDgxLjE1IDUwIDEyMCA1MHptMCAxNy44OGMtMTMuOTUgMC0zMC40OSAxNi45LTQzLjUzIDQyLjI3LTcuODEgMTUuMjUtMTAuOTkgMjkuODUtMTAuOTkgNDIuNzQgMCAyMS4xMyAxNy4xOCAzOC4zMiAzOC4zMiAzOC4zMkgxNDJjMjEuMTMgMCAzOC4zMi0xNy4xOCAzOC4zMi0zOC4zMiAwLTEyLjg4LTMuMTgtMjcuNDktMTAuOTktNDIuNzRDMTU2LjI5IDg0Ljc4IDEzMy45NSA2Ny44OCAxMjAgNjcuODh6Ii8+PHBhdGggZmlsbD0iIzgxQzc4NCIgZD0iTTEyMCA5Ni42M2M4LjM3IDAgMTUuMTYgNi43OSAxNS4xNiAxNS4xNnY4LjYyYzAgOC4zNy02Ljc5IDE1LjE2LTE1LjE2IDE1LjE2cy0xNS4xNi02Ljc5LTE1LjE2LTE1LjE2di04LjYyYzAtOC4zNyA2Ljc5LTE1LjE2IDE1LjE2LTE1LjE2eiIvPjxwYXRoIGZpbGw9IiM4MUM3ODQiIGQ9Ik0xNDUuNzkgMTIwYzAgOC4zNy02Ljc5IDE1LjE2LTE1LjE2IDE1LjE2aC04LjYyYy04LjM3IDAtMTUuMTYtNi43OS0xNS4xNi0xNS4xNnM2Ljc5LTE1LjE2IDE1LjE2LTE1LjE2aDguNjJjOC4zNyAwIDE1LjE2IDYuNzkgMTUuMTYgMTUuMTZ6Ii8+PHBhdGggZmlsbD0iIzgxQzc4NCIgZD0iTTEzNC4yNiAxMzQuMjZjNS45MiA1LjkyIDUuOTIgMTUuNTEgMCAyMS40M2wtNi4xIDYuMWMtNS45MiA1LjkyLTE1LjUxIDUuOTItMjEuNDMgMHMtNS45Mi0xNS41MSAwLTIxLjQzbDYuMS02LjFjNS45Mi01LjkyIDE1LjUxLTUuOTIgMjEuNDMgMHoiLz48cGF0aCBmaWxsPSIjODFDNzg0IiBkPSJNMTM0LjI2IDEwNS43NGMtNS45MiA1LjkyLTE1LjUxIDUuOTItMjEuNDMgMGwtNi4xLTYuMWMtNS45Mi01LjkyLTUuOTItMTUuNTEgMC0yMS40M3MxNS41MS01LjkyIDIxLjQzIDBsNi4xIDYuMWM1LjkyIDUuOTIgNS45MiAxNS41MSAwIDIxLjQzeiIvPjwvc3ZnPg==" alt="No image generated yet">
+
+			<img id="currentImage" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM2NjY2NjYiPkNhbm5hYmlzIFN0cmFpbiBMYWJlbDwvdGV4dD48dGV4dCB4PSIxNTAiIHk9IjE2MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjODg4ODg4Ij5EZXNjcmliZSB5b3VyIHN0cmFpbiBhbmQgY2xpY2sgR2VuZXJhdGU8L3RleHQ+PC9zdmc+" alt="Generate a label design">
             </div>
             <div class="image-controls">
                 <div class="options-group">
@@ -668,9 +676,9 @@
                     if (message.toLowerCase().includes('generate') || 
                         message.toLowerCase().includes('create') || 
                         message.toLowerCase().includes('visualize') || 
-                        message.toLowerCase().includes('show me')) {
+                        message.toLowerCase().includes('show me')) {						
 						setTimeout(() => {
-							addMessage("Welcome to DayDreamer Genetics Strain Branding Assistant! I can help you create names, labels and brand identities for your cannabis strains. Share details about your strain's lineage, effects, or characteristics, and I'll suggest creative names. Once you've chosen a name, I can help generate a custom label image. How can I help with your strain branding today?", false);
+							addMessage("Welcome to DayDreamer Genetics! I'm your cannabis strain branding assistant. I can help you create names, marketing materials, and label designs for your cannabis products. Describe your strain's lineage, effects, or the vibe you're going for, and we'll get started!", false);
 						}, 500);
                     }
                     
@@ -684,7 +692,7 @@
             // Function to generate image from prompt
 			async function generateImageFromPrompt(prompt) {
 				if (isGenerating) {
-					showToast("Already generating an image, please wait...");
+					showToast("Already generating a label, please wait...");
 					return;
 				}
 				
@@ -714,7 +722,6 @@
 				const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true${enhanceParam}${privateParam}${modelParam}&width=512&height=512&seed=${Math.floor(Math.random() * 1000000)}`;
 				
 				try {
-					// Simulate fetching the image (actual fetch happens when img.src is set)
 					showToast("Generating your cannabis strain label...");
 					
 					// Create new image element and set up load/error handlers
@@ -806,39 +813,62 @@
             function populateStyleSelector() {
                 // An abbreviated list of styles - you can expand this with more from your provided list
                 const styles = [
-			{ text: "Anime", value: "anime:1.3, line drawing, asian influence, vibrant colors, cel shading, large expressive eyes, detailed hair, dynamic poses" },
-			{ text: "Art Deco", value: "art deco, geometric shapes, rich colors, lavish ornamentation, luxorious, symmetry, detailed, elegant" },
-			{ text: "Cyberpunk", value: "cyberpunk, futuristic, neon colors, dark atmosphere, highly detailed, neon lights, urban, dystopian, high-tech" },
-			{ text: "Digital Painting", value: "digital painting, smooth gradients, vibrant colors, highly detailed" },
-			{ text: "Fantasy Art", value: "fantasy art, imaginative, vibrant colors, mythical creatures, detailed, epic, magical, dynamic, mythical, highly detailed" },
-			{ text: "Hyperrealism", value: "hyperrealism, extremely detailed, lifelike, photographic, high contrast, textures, meticulous, natural colors, precise" },
-			{ text: "Nature Art", value: "nature art, natural elements, organic, detailed, highly detailed" },
-			{ text: "Photorealism", value: "photorealism, extremely detailed, lifelike, high contrast, textures, meticulous, realistic" },
-			{ text: "Pop Art", value: "pop art, bold colors, commercial imagery, comic strip style, repetition, detailed, vibrant" },
-			{ text: "Psychedelic Art", value: "psychedelic art, vibrant colors, abstract, trippy, highly detailed, imaginative" },
-			{ text: "Surrealism", value: "surrealism, dream-like, bizarre, abstract, fantastical, juxtapositions, detailed, strange, whimsical" },
-			{ text: "Vaporwave", value: "vaporwave, 80s aesthetic, neon colors, glitch art, nostalgic, surreal, detailed, retro" },
-			{ text: "Watercolor", value: "watercolor painting, soft edges, pastel colors, natural textures, highly detailed" },
-			{ text: "Minimalist", value: "minimalist design, clean, elegant, simple, modern packaging" },
-			{ text: "Luxury", value: "luxury packaging, premium, gold accents, high-end, sophisticated design" },
-			{ text: "Vintage", value: "vintage label, retro packaging, classic design, nostalgic, aged paper texture" },
-			{ text: "Medical", value: "medical cannabis packaging, pharmaceutical style, clinical, professional, health-focused" },
-			{ text: "Organic", value: "organic product packaging, natural elements, eco-friendly, plant motifs, earth tones" },
-			{ text: "Psychedelic", value: "psychedelic art, vibrant colors, trippy, abstract patterns, 60s inspired" },
-			{ text: "Hipster", value: "hipster design, artisanal, handcrafted look, indie aesthetic, craft cannabis" },
-			{ text: "Corporate", value: "corporate branding, professional, clean lines, business-like, corporate identity" },
-			{ text: "Illustrated", value: "hand-drawn illustration, artistic, detailed artwork, creative, unique illustration" },
-			{ text: "Holographic", value: "holographic elements, iridescent, futuristic, shimmering effect, modern" }
+                    { text: "Anime", value: "anime:1.3, line drawing, asian influence, vibrant colors, cel shading, large expressive eyes, detailed hair, dynamic poses" },
+                    { text: "Art Deco", value: "art deco, geometric shapes, rich colors, lavish ornamentation, luxorious, symmetry, detailed, elegant" },
+                    { text: "Cyberpunk", value: "cyberpunk, futuristic, neon colors, dark atmosphere, highly detailed, neon lights, urban, dystopian, high-tech" },
+                    { text: "Digital Painting", value: "digital painting, smooth gradients, vibrant colors, highly detailed" },
+                    { text: "Fantasy Art", value: "fantasy art, imaginative, vibrant colors, mythical creatures, detailed, epic, magical, dynamic, mythical, highly detailed" },
+                    { text: "Hyperrealism", value: "hyperrealism, extremely detailed, lifelike, photographic, high contrast, textures, meticulous, natural colors, precise" },
+                    { text: "Nature Art", value: "nature art, natural elements, organic, detailed, highly detailed" },
+                    { text: "Photorealism", value: "photorealism, extremely detailed, lifelike, high contrast, textures, meticulous, realistic" },
+                    { text: "Pop Art", value: "pop art, bold colors, commercial imagery, comic strip style, repetition, detailed, vibrant" },
+                    { text: "Psychedelic Art", value: "psychedelic art, vibrant colors, abstract, trippy, highly detailed, imaginative" },
+                    { text: "Surrealism", value: "surrealism, dream-like, bizarre, abstract, fantastical, juxtapositions, detailed, strange, whimsical" },
+                    { text: "Vaporwave", value: "vaporwave, 80s aesthetic, neon colors, glitch art, nostalgic, surreal, detailed, retro" },
+                    { text: "Watercolor", value: "watercolor painting, soft edges, pastel colors, natural textures, highly detailed" },
+					{ text: "Minimalist", value: "minimalist design, clean, elegant, simple, modern packaging" },
+					{ text: "Luxury", value: "luxury packaging, premium, gold accents, high-end, sophisticated design" },
+					{ text: "Vintage", value: "vintage label, retro packaging, classic design, nostalgic, aged paper texture" },
+					{ text: "Medical", value: "medical cannabis packaging, pharmaceutical style, clinical, professional, health-focused" },
+					{ text: "Organic", value: "organic product packaging, natural elements, eco-friendly, plant motifs, earth tones" },
+					{ text: "Psychedelic", value: "psychedelic art, vibrant colors, trippy, abstract patterns, 60s inspired" },
+					{ text: "Hipster", value: "hipster design, artisanal, handcrafted look, indie aesthetic, craft cannabis" },
+					{ text: "Corporate", value: "corporate branding, professional, clean lines, business-like, corporate identity" },
+					{ text: "Illustrated", value: "hand-drawn illustration, artistic, detailed artwork, creative, unique illustration" },
+					{ text: "Holographic", value: "holographic elements, iridescent, futuristic, shimmering effect, modern" }
 				];
                 
-                // Add options to select
-                styles.forEach(style => {
-                    const option = document.createElement('option');
-                    option.value = style.value;
-                    option.textContent = style.text;
-                    styleSelector.appendChild(option);
-                });
-            }
+				// Check if styles array is empty
+				if (styles.length === 0) {
+					console.error("Styles array is empty!");
+					// Add a fallback style
+					const fallbackStyle = { text: "Default", value: "professional label design" };
+					const option = document.createElement('option');
+					option.value = fallbackStyle.value;
+					option.textContent = fallbackStyle.text;
+					styleSelector.appendChild(option);
+					return;
+				}
+				
+				// Log styles length
+				console.log(`Adding ${styles.length} styles to selector`);
+				
+				// Add options to select
+				styles.forEach((style, index) => {
+					const option = document.createElement('option');
+					option.value = style.value;
+					option.textContent = style.text;
+					styleSelector.appendChild(option);
+					
+					// Log every 10th style to avoid console spam
+					if (index % 10 === 0) {
+						console.log(`Added style #${index}: ${style.text}`);
+					}
+				});
+				
+				// Verify styles were added
+				console.log(`Total options in selector after population: ${styleSelector.options.length}`);
+			}
 
             // Function to list all available styles
             function listStyles() {
