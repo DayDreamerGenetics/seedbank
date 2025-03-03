@@ -662,12 +662,25 @@
 
 			// Function to send message to AI
 			async function sendMessage(message, generateImage = false) {
-				if (!message.trim()) return;
+				if (!message.trim() && !generateImage) return;
 				
-				addMessage(message, true);
-				messageInput.value = '';
+				// If generate button clicked without input, reuse last prompt
+				if (generateImage && !message.trim()) {
+					if (currentPrompt) {
+						generateImageFromPrompt(currentPrompt);
+					} else {
+						showToast("Please enter a description first or chat to generate content.");
+					}
+					return;
+				}
 				
-				// If explicitly asked to generate image, do it directly without AI chat
+				// Add user message to chat
+				if (message.trim()) {
+					addMessage(message, true);
+					messageInput.value = '';
+				}
+				
+				// If generate button clicked with input, send prompt directly to image generator
 				if (generateImage) {
 					generateImageFromPrompt(message);
 					return;
@@ -676,16 +689,32 @@
 				showTypingIndicator();
 				
 				try {
-					// Create properly formatted messages array
+					// System message with clear function syntax for the AI to use
 					const systemMessage = {
 						role: 'system',
 						content: `You are a cannabis strain branding specialist for DayDreamer Genetics.
-						Keep responses brief. When users describe strain characteristics:
-						- Provide a list of 5-7 creative name options.
-						- When users request an image or visualization, respond with ONLY the strain name or concept they've described.
-						- Don't include the text "Prompt for AI Image Generator:" in your responses.
-						- Don't repeat back the user's prompt.
-						- Keep responses concise and focused on the strain names or concepts.`
+						KEEP ALL RESPONSES BRIEF AND TO THE POINT.
+						
+						When users describe strain characteristics:
+						- Provide a simple list of 5-7 creative name options (no long explanations)
+						
+						You have access to the following command:
+						
+						GENERATE_IMAGE: [detailed visual description]
+						
+						Use the GENERATE_IMAGE command when:
+						1. A user explicitly asks for an image or visualization
+						2. A user selects one of your suggested names and wants to see it
+						3. You believe an image would enhance the conversation
+						
+						When using GENERATE_IMAGE, provide a detailed visual description that includes:
+						- Visual style (artistic styles, color scheme, mood)
+						- Main elements and their arrangement and background if desired
+						- Text that should appear (strain name, etc.)
+						
+						Example: "GENERATE_IMAGE: A minimalist label design for 'Cosmic Haze' cannabis strain with deep purple and blue gradients, featuring a stylized galaxy spiral in the center, gold metallic text, and a luxurious dark background with subtle cosmic dust elements."
+						
+						You can both respond conversationally AND generate an image in the same message if appropriate.`
 					};
 					
 					// Send conversation history with proper roles
@@ -694,13 +723,10 @@
 						...conversationHistory
 					];
 					
-					// Keep history manageable
+					// Keep history manageable (10 user, 10 assistant messages + system)
 					if (messages.length > 21) {
 						messages.splice(1, messages.length - 21);
 					}
-					
-					// Generate random seed
-					const randomSeed = Math.floor(Math.random() * 1000000);
 					
 					// Send to Pollinations.AI Text API
 					const response = await fetch('https://text.pollinations.ai/', {
@@ -713,7 +739,7 @@
 							model: 'openai-large',
 							private: true,
 							jsonMode: false,
-							seed: randomSeed
+							seed: Math.floor(Math.random() * 1000000)
 						}),
 					});
 					
@@ -724,24 +750,33 @@
 					const responseText = await response.text();
 					removeTypingIndicator();
 					
-					// Add AI response to chat
-					addMessage(responseText, false);
+					// Check for GENERATE_IMAGE command
+					const generateImageMatch = responseText.match(/GENERATE_IMAGE:\s*(.*?)(?:\n|$)/s);
 					
-					// Check if user was asking for an image
-					const imageKeywords = ['image', 'picture', 'visual', 'visualize', 'show me', 'generate', 'create', 'label'];
-					const userWantsImage = imageKeywords.some(keyword => message.toLowerCase().includes(keyword));
-					
-					if (userWantsImage) {
-						// Use responseText as the name or the user's message as the prompt
+					if (generateImageMatch && generateImageMatch[1]) {
+						// Extract the detailed description
+						const imageDescription = generateImageMatch[1].trim();
+						
+						// Save as current prompt for reuse
+						currentPrompt = imageDescription;
+						
+						// Show the AI's response without the command
+						const cleanResponse = responseText.replace(/GENERATE_IMAGE:\s*(.*?)(?:\n|$)/s, '').trim();
+						addMessage(cleanResponse || "Generating your strain label design...", false);
+						
+						// Generate the image
 						setTimeout(() => {
-							generateImageFromPrompt(responseText || message);
+							generateImageFromPrompt(imageDescription);
 						}, 500);
+					} else {
+						// Regular response without image generation
+						addMessage(responseText, false);
 					}
 					
 				} catch (error) {
 					console.error('Error:', error);
 					removeTypingIndicator();
-					addMessage("I'm sorry, I encountered an error. Please try again.", false);
+					addMessage("I'm sorry, I encountered an error while processing your request. Please try again.", false);
 				}
 			}
 
@@ -755,39 +790,28 @@
 				isGenerating = true;
 				imageDisplay.classList.add('loading');
 				
-				// Extract strain name from prompt
-				let strainName = "";
-				const nameRegex = /'([^']+)'|"([^"]+)"|named\s+['"]?([^'"]+?)['"]?|called\s+['"]?([^'"]+?)['"]?/i;
-				const nameMatch = prompt.match(nameRegex);
-				
-				if (nameMatch) {
-					// Find the first non-undefined capture group
-					strainName = nameMatch.slice(1).find(match => match !== undefined) || "";
-				}
-				
-				// Store current prompt
+				// Store current prompt for potential reuse
 				currentPrompt = prompt;
 				
-				// Create direct image prompt without additional text
-				let imagePrompt = strainName ? 
-					`${strainName} cannabis strain label design` : 
-					`${prompt}`;
+				// Create a more specific prompt if needed
+				let enhancedPrompt = prompt;
 				
 				// Add styles to prompt if selected
 				if (selectedStyles.length > 0) {
 					const styleText = selectedStyles.map(style => style.value).join(', ');
-					imagePrompt += `, ${styleText}`;
+					enhancedPrompt += `, ${styleText}`;
 				}
 				
-				// Create the image URL with parameters
-				const encodedPrompt = encodeURIComponent(imagePrompt);
+				// Create the image URL with parameters - always use random seed
+				const randomSeed = Math.floor(Math.random() * 1000000);
+				const encodedPrompt = encodeURIComponent(enhancedPrompt);
 				const enhanceParam = enhanceOption.checked ? '&enhance=true' : '';
 				const privateParam = privateOption.checked ? '&private=true' : '';
 				const modelParam = '&model=flux';
-				const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true${enhanceParam}${privateParam}${modelParam}&width=512&height=512&seed=${Math.floor(Math.random() * 1000000)}`;
+				const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true${enhanceParam}${privateParam}${modelParam}&width=512&height=512&seed=${randomSeed}`;
 				
 				try {
-					showToast("Generating your cannabis strain label..." + (strainName ? ` for "${strainName}"` : ""));
+					showToast("Generating your cannabis strain label...");
 					
 					// Create new image element and set up load/error handlers
 					const img = new Image();
@@ -795,18 +819,13 @@
 					img.onload = function() {
 						// Update the current image and display
 						currentImage.src = imageUrl;
-						currentImage.alt = strainName || prompt;
+						currentImage.alt = "Cannabis strain label";
 						
-						// Add the image to the chat with a simple message
-						const messageText = strainName ? 
-							`Here's your "${strainName}" label design` : 
-							`Here's your label design`;
-						addMessage(messageText, false, imageUrl);
+						// Add the image to the chat
+						addMessage("Here's your label design:", false, imageUrl);
 						
 						// Add download link
-						const fileName = strainName ? 
-							`daydreamer_${strainName.toLowerCase().replace(/\s+/g, '_')}.jpg` : 
-							'daydreamer_strain_label.jpg';
+						const fileName = 'daydreamer_strain_label.jpg';
 						downloadLink.innerHTML = `<a href="${imageUrl}" download="${fileName}" style="color: white;"><i class="fas fa-download"></i></a>`;
 						
 						// Cleanup
