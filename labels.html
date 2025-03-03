@@ -74,6 +74,35 @@
 			gap: 0.75rem;
 		}
 
+		/* Allow style tags area to expand as needed */
+		.style-tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.25rem;
+			margin-top: 0.25rem;
+			overflow: visible; /* Ensure no scrollbar appears */
+		}
+
+		/* Make the image controls container expand to fit content */
+		.image-controls {
+			padding: 0.5rem;
+			overflow: visible; /* No scrollbars */
+			height: auto; /* Allow natural height */
+			max-height: none; /* Remove maximum height restriction */
+		}
+
+		/* Adjust image display to resize as needed */
+		.image-display {
+			flex: 1; /* Takes available space */
+			min-height: 400px; /* Ensures minimum reasonable size */
+		}
+
+		/* Ensure container can grow if needed */
+		.image-container {
+			height: auto; /* Allow natural height */
+			min-height: 600px; /* Ensure minimum height */
+		}
+
 		@media (max-width: 768px) {
 			.container {
 				grid-template-columns: 1fr;
