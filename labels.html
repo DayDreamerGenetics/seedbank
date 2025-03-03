@@ -821,8 +821,8 @@
 						currentImage.src = imageUrl;
 						currentImage.alt = "Cannabis strain label";
 						
-						// Add the image to the chat
-						addMessage("Here's your label design:", false, imageUrl);
+						// Add text notification to chat but NOT the image itself
+						addMessage("Your label design has been generated in the display area.", false);
 						
 						// Add download link
 						const fileName = 'daydreamer_strain_label.jpg';
