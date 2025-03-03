@@ -806,9 +806,9 @@
 				// Create a more specific prompt focused on label quality
 				let enhancedPrompt = "";
 				if (strainName) {
-					enhancedPrompt = `Professional cannabis product label design with text "${strainName}" prominently displayed as the strain name, premium packaging, clear typography, high quality product photo, commercial cannabis branding, elegant strain label design`;
+					enhancedPrompt = `"${strainName}"`;
 				} else {
-					enhancedPrompt = `Professional cannabis strain label design based on: "${prompt}", product packaging, strain name clearly visible, premium quality label, commercial cannabis branding`;
+					enhancedPrompt = `"${prompt}"`;
 				}
 				
 				// Add styles to prompt if selected
@@ -837,8 +837,8 @@
 						
 						// Add the image to the chat
 						const messageText = strainName ? 
-							`I've generated a label design for "${strainName}"` : 
-							`I've generated a label design based on your description`;
+							`I have generated a label design for "${strainName}"` : 
+							`I have generated a label design based on your description`;
 						addMessage(messageText, false, imageUrl);
 						
 						// Add download link
