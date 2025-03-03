@@ -616,6 +616,35 @@
                 }
             }
 
+			function detectImageRequest(userMessage, aiResponse) {
+				// Check if user is asking for an image
+				const imageKeywords = ['image', 'picture', 'visual', 'visualize', 'show me', 'generate', 'create'];
+				
+				// If user mentions image-related terms, generate an image
+				if (imageKeywords.some(keyword => userMessage.toLowerCase().includes(keyword))) {
+					// Extract the strain name or description from the conversation
+					let imagePrompt = "";
+					
+					// Check if we have a strain name in context
+					const nameMatch = aiResponse.match(/\*\*(.*?)\*\*/);
+					if (nameMatch && nameMatch[1]) {
+						imagePrompt = nameMatch[1] + " cannabis strain label";
+					} else {
+						// Use the user's message as the prompt
+						imagePrompt = userMessage + " cannabis strain label";
+					}
+					
+					// Generate the image
+					setTimeout(() => {
+						generateImageFromPrompt(imagePrompt);
+					}, 500);
+					
+					return true;
+				}
+				
+				return false;
+			}
+
 			// Function to send message to AI
 			async function sendMessage(message, generateImage = false) {
 				if (!message.trim()) return;
@@ -634,13 +663,13 @@
 					// Create properly formatted messages array
 					const systemMessage = {
 						role: 'system',
-						content: `You are a cannabis strain branding specialist for DayDreamer Genetics. 
-						Help users create strain names, labels, and marketing materials for their cannabis products.
-						When users mention parent strains or characteristics, suggest creative strain names that reflect the lineage and effects.
-						If asked, generate 5-10 name options with brief explanations of why each name fits.
-						Provide advice on branding, marketing copy, and label design for cannabis products.
-						When users select a name they like, encourage them to generate a label image.
-						Keep responses knowledgeable but concise, focusing on creative branding and marketing.`
+						content: `You are a cannabis strain branding specialist for DayDreamer Genetics.
+						KEEP ALL RESPONSES BRIEF AND TO THE POINT.
+						When users describe strain characteristics:
+						- Provide a simple list of 5-7 creative name options (no long explanations)
+						- IMMEDIATELY offer to generate a label image
+						If the user mentions wanting an image or visualization, tell them you're generating an image and then actually do it.
+						Your main purpose is to help brand and visualize cannabis products efficiently.`
 					};
 					
 					// Send all conversation history with proper roles
@@ -682,6 +711,15 @@
 					
 					// Add AI response to chat
 					addMessage(responseText, false);
+					
+					// Check if user was asking for an image or visualization
+					const imageKeywords = ['image', 'picture', 'visual', 'visualize', 'show me', 'generate', 'create', 'label'];
+					if (imageKeywords.some(keyword => message.toLowerCase().includes(keyword)) && !generateImage) {
+						// Extract details from user message for image generation
+						setTimeout(() => {
+							generateImageFromPrompt(message);
+						}, 800);
+					}
 					
 				} catch (error) {
 					console.error('Error:', error);
@@ -910,6 +948,19 @@
                     sendBtn.click();
                 }
             });
+
+			messageInput.addEventListener('input', () => {
+				const value = messageInput.value.toLowerCase();
+				if (value.includes('/image') || value.includes('/generate')) {
+					const prompt = value.replace('/image', '').replace('/generate', '').trim();
+					if (prompt) {
+						messageInput.value = '';
+						generateImageFromPrompt(prompt);
+					} else {
+						showToast("Please add a description after /image or /generate");
+					}
+				}
+			});
 
             // Style selector events
             styleSelector.addEventListener('change', () => {
