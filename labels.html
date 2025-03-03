@@ -577,41 +577,41 @@
                 }, duration);
             }
 
-            // Function to add message to chat
-            function addMessage(content, isUser, imageUrl = null) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = isUser ? 'message message-user' : 'message message-ai';
-                
-                const messageContent = document.createElement('div');
-                messageContent.className = 'message-content';
-                messageContent.textContent = content;
-                messageDiv.appendChild(messageContent);
-                
-                if (imageUrl) {
-                    const img = document.createElement('img');
-                    img.src = imageUrl;
-                    img.alt = 'Generated cannabis strain';
-                    img.className = 'message-image';
-                    img.addEventListener('click', () => {
-                        openImageModal(imageUrl);
-                    });
-                    messageDiv.appendChild(img);
-                }
-                
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                
-                // Update conversation history
-                conversationHistory.push({
-                    role: isUser ? 'user' : 'assistant',
-                    content: content
-                });
+			// Function to add message to chat
+			function addMessage(content, isUser, imageUrl = null) {
+				const messageDiv = document.createElement('div');
+				messageDiv.className = isUser ? 'message message-user' : 'message message-ai';
+				
+				const messageContent = document.createElement('div');
+				messageContent.className = 'message-content';
+				messageContent.textContent = content;
+				messageDiv.appendChild(messageContent);
+				
+				if (imageUrl) {
+					const img = document.createElement('img');
+					img.src = imageUrl;
+					img.alt = 'Generated cannabis strain';
+					img.className = 'message-image';
+					img.addEventListener('click', () => {
+						openImageModal(imageUrl);
+					});
+					messageDiv.appendChild(img);
+				}
+				
+				chatMessages.appendChild(messageDiv);
+				chatMessages.scrollTop = chatMessages.scrollHeight;
+				
+				// Update conversation history
+				conversationHistory.push({
+					role: isUser ? 'user' : 'assistant',
+					content: content
+				});
 
-                // Limit history to last 10 messages
-                if (conversationHistory.length > 10) {
-                    conversationHistory = conversationHistory.slice(-10);
-                }
-            }
+				// Limit history to last 10 messages
+				if (conversationHistory.length > 10) {
+					conversationHistory = conversationHistory.slice(-10);
+				}
+			}
 
             // Function to show typing indicator
             function showTypingIndicator() {
@@ -695,9 +695,9 @@
 						...conversationHistory
 					];
 					
-					// Keep history manageable (last 20 messages - 10 user, 10 assistant)
-					if (messages.length > 21) { // 1 system + 20 conversation messages
-						messages.splice(1, messages.length - 21); // Remove oldest messages but keep system message
+					// Keep history manageable
+					if (messages.length > 21) {
+						messages.splice(1, messages.length - 21);
 					}
 					
 					// Generate random seed for variety in responses
@@ -722,42 +722,39 @@
 						throw new Error('Failed to get response from AI');
 					}
 					
-					// Direct text handling - no JSON parsing
 					const responseText = await response.text();
 					removeTypingIndicator();
 					
 					// Add AI response to chat
 					addMessage(responseText, false);
 					
-					// Check if user was asking for an image or visualization
-					const userRequestsImage = ['image', 'picture', 'visual', 'visualize', 'show me', 'generate', 'create', 'label']
-						.some(keyword => message.toLowerCase().includes(keyword));
+					// Simplified image request detection
+					const userWantsImage = message.toLowerCase().includes('image') || 
+										 message.toLowerCase().includes('picture') || 
+										 message.toLowerCase().includes('generate') ||
+										 message.toLowerCase().includes('visualization') ||
+										 message.toLowerCase().includes('show me');
 					
-					// Check if AI response mentions generating an image
-					const aiOffersImage = responseText.toLowerCase().includes('generate an image') || 
-										 responseText.toLowerCase().includes('generate a label') ||
-										 responseText.toLowerCase().includes('generate image') ||
-										 responseText.toLowerCase().includes('would you like to see') ||
-										 responseText.toLowerCase().includes('would you like me to generate') ||
-										 responseText.toLowerCase().includes('i can create a label');
-					
-					// Extract strain name if it exists in AI response
-					let strainName = "";
-					const nameMatch = responseText.match(/\*\*(.*?)\*\*/);
-					if (nameMatch && nameMatch[1]) {
-						strainName = nameMatch[1];
-					}
-					
-					// Generate image if user requested or AI offered
-					if ((userRequestsImage || aiOffersImage) && !generateImage) {
-						// Use strain name if found, otherwise use user message
-						const imagePrompt = strainName ? 
-							`${strainName} cannabis strain label` : 
-							`${message} cannabis strain label`;
+					// If user directly requested an image, generate it
+					if (userWantsImage && !generateImage) {
+						// Extract strain name if it exists
+						let strainName = "";
+						const nameMatch = responseText.match(/\*\*(.*?)\*\*/) || 
+									   responseText.match(/["'](.*?)["']/) ||
+									   responseText.match(/\d+\.\s+(.*?)(?:\n|$)/);
 						
-						setTimeout(() => {
-							generateImageFromPrompt(imagePrompt);
-						}, 800);
+						if (nameMatch && nameMatch[1]) {
+							strainName = nameMatch[1].trim();
+							const imagePrompt = `${strainName} cannabis strain label design`;
+							setTimeout(() => {
+								generateImageFromPrompt(imagePrompt);
+							}, 800);
+						} else {
+							// No strain name found, use the user's message
+							setTimeout(() => {
+								generateImageFromPrompt(message + " cannabis strain label design");
+							}, 800);
+						}
 					}
 					
 				} catch (error) {
@@ -777,39 +774,37 @@
 				isGenerating = true;
 				imageDisplay.classList.add('loading');
 				
-				// Extract strain name from conversation or prompt
+				// Extract strain name from prompt or conversation
 				let strainName = "";
-				// Look for strain name in recent conversation
-				for (let i = conversationHistory.length - 1; i >= 0; i--) {
-					const msg = conversationHistory[i].content;
-					// Check for quoted names or numbered lists with names
-					const nameMatch = msg.match(/["']([^"']+)["']/) || 
-									 msg.match(/\d+\.\s+([A-Za-z\s]+)/) ||
-									 msg.match(/\*\*([A-Za-z\s]+)\*\*/);
-					if (nameMatch && nameMatch[1]) {
-						strainName = nameMatch[1].trim();
-						break;
-					}
-				}
 				
-				// If no strain name found, check the current prompt
-				if (!strainName) {
-					const nameFromPrompt = prompt.match(/["']([^"']+)["']/) || prompt.match(/name\s+["']?([^"']+)["']?/i);
-					if (nameFromPrompt && nameFromPrompt[1]) {
-						strainName = nameFromPrompt[1].trim();
+				// Look for strain name in the prompt first
+				const nameFromPrompt = prompt.match(/["'](.*?)["']/) || 
+									 prompt.match(/name\s+["']?(.*?)["']?/i);
+				
+				if (nameFromPrompt && nameFromPrompt[1]) {
+					strainName = nameFromPrompt[1].trim();
+				} else {
+					// Look in recent conversation
+					for (let i = conversationHistory.length - 1; i >= 0; i--) {
+						const msg = conversationHistory[i].content;
+						const nameMatch = msg.match(/["'](.*?)["']/) || 
+									   msg.match(/\d+\.\s+(.*?)(?:\n|$)/) ||
+									   msg.match(/\*\*(.*?)\*\*/);
+						
+						if (nameMatch && nameMatch[1]) {
+							strainName = nameMatch[1].trim();
+							break;
+						}
 					}
 				}
 				
 				// Store current prompt
 				currentPrompt = prompt;
 				
-				// Create a more specific prompt focused on label quality
-				let enhancedPrompt = "";
-				if (strainName) {
-					enhancedPrompt = `"${strainName}"`;
-				} else {
-					enhancedPrompt = `"${prompt}"`;
-				}
+				// Create enhanced prompt for better image generation
+				let enhancedPrompt = strainName ? 
+					`"${strainName}" cannabis strain label design` : 
+					`"${prompt}" cannabis strain label design`;
 				
 				// Add styles to prompt if selected
 				if (selectedStyles.length > 0) {
@@ -837,8 +832,8 @@
 						
 						// Add the image to the chat
 						const messageText = strainName ? 
-							`I have generated a label design for "${strainName}"` : 
-							`I have generated a label design based on your description`;
+							`Here's a label design for "${strainName}"` : 
+							`Here's a label design based on your description`;
 						addMessage(messageText, false, imageUrl);
 						
 						// Add download link
@@ -1021,7 +1016,9 @@
 
 			messageInput.addEventListener('input', () => {
 				const value = messageInput.value.toLowerCase();
-				if (value.includes('/image') || value.includes('/generate')) {
+				
+				// Handle command shortcuts
+				if (value.startsWith('/image') || value.startsWith('/generate')) {
 					const prompt = value.replace('/image', '').replace('/generate', '').trim();
 					if (prompt) {
 						messageInput.value = '';
@@ -1029,6 +1026,9 @@
 					} else {
 						showToast("Please add a description after /image or /generate");
 					}
+				} else if (value === '/styles' || value === '/list styles') {
+					messageInput.value = '';
+					listStyles();
 				}
 			});
 
