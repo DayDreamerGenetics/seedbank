@@ -667,6 +667,7 @@
 				addMessage(message, true);
 				messageInput.value = '';
 				
+				// If explicitly asked to generate image, do it directly without AI chat
 				if (generateImage) {
 					generateImageFromPrompt(message);
 					return;
@@ -679,17 +680,15 @@
 					const systemMessage = {
 						role: 'system',
 						content: `You are a cannabis strain branding specialist for DayDreamer Genetics.
-						KEEP ALL RESPONSES BRIEF AND TO THE POINT.
-						When users describe strain characteristics:
-						- Provide a simple list of 5-7 creative name options (no long explanations)
-						- IMMEDIATELY OFFER to generate an image and THEN WAIT for the response OR 
-						IF the user mentions wanting it now and provides a concept, actually do it,
-						while including the strain name in the image prompt description clearly.
-						Your purpose is to brand and visualize cannabis concepts efficiently by rendering an image.
-						Keep all image prompts visually descriptive and include visual styles to suit the theme needed.`
+						Keep responses brief. When users describe strain characteristics:
+						- Provide a list of 5-7 creative name options.
+						- When users request an image or visualization, respond with ONLY the strain name or concept they've described.
+						- Don't include the text "Prompt for AI Image Generator:" in your responses.
+						- Don't repeat back the user's prompt.
+						- Keep responses concise and focused on the strain names or concepts.`
 					};
 					
-					// Send all conversation history with proper roles
+					// Send conversation history with proper roles
 					const messages = [
 						systemMessage,
 						...conversationHistory
@@ -700,7 +699,7 @@
 						messages.splice(1, messages.length - 21);
 					}
 					
-					// Generate random seed for variety in responses
+					// Generate random seed
 					const randomSeed = Math.floor(Math.random() * 1000000);
 					
 					// Send to Pollinations.AI Text API
@@ -728,39 +727,21 @@
 					// Add AI response to chat
 					addMessage(responseText, false);
 					
-					// Simplified image request detection
-					const userWantsImage = message.toLowerCase().includes('image') || 
-										 message.toLowerCase().includes('picture') || 
-										 message.toLowerCase().includes('generate') ||
-										 message.toLowerCase().includes('visualization') ||
-										 message.toLowerCase().includes('show me');
+					// Check if user was asking for an image
+					const imageKeywords = ['image', 'picture', 'visual', 'visualize', 'show me', 'generate', 'create', 'label'];
+					const userWantsImage = imageKeywords.some(keyword => message.toLowerCase().includes(keyword));
 					
-					// If user directly requested an image, generate it
-					if (userWantsImage && !generateImage) {
-						// Extract strain name if it exists
-						let strainName = "";
-						const nameMatch = responseText.match(/\*\*(.*?)\*\*/) || 
-									   responseText.match(/["'](.*?)["']/) ||
-									   responseText.match(/\d+\.\s+(.*?)(?:\n|$)/);
-						
-						if (nameMatch && nameMatch[1]) {
-							strainName = nameMatch[1].trim();
-							const imagePrompt = `${strainName} cannabis strain label design`;
-							setTimeout(() => {
-								generateImageFromPrompt(imagePrompt);
-							}, 800);
-						} else {
-							// No strain name found, use the user's message
-							setTimeout(() => {
-								generateImageFromPrompt(message + " cannabis strain label design");
-							}, 800);
-						}
+					if (userWantsImage) {
+						// Use responseText as the name or the user's message as the prompt
+						setTimeout(() => {
+							generateImageFromPrompt(responseText || message);
+						}, 500);
 					}
 					
 				} catch (error) {
 					console.error('Error:', error);
 					removeTypingIndicator();
-					addMessage("I'm sorry, I encountered an error while processing your request. Please try again.", false);
+					addMessage("I'm sorry, I encountered an error. Please try again.", false);
 				}
 			}
 
@@ -774,53 +755,39 @@
 				isGenerating = true;
 				imageDisplay.classList.add('loading');
 				
-				// Extract strain name from prompt or conversation
+				// Extract strain name from prompt
 				let strainName = "";
+				const nameRegex = /'([^']+)'|"([^"]+)"|named\s+['"]?([^'"]+?)['"]?|called\s+['"]?([^'"]+?)['"]?/i;
+				const nameMatch = prompt.match(nameRegex);
 				
-				// Look for strain name in the prompt first
-				const nameFromPrompt = prompt.match(/["'](.*?)["']/) || 
-									 prompt.match(/name\s+["']?(.*?)["']?/i);
-				
-				if (nameFromPrompt && nameFromPrompt[1]) {
-					strainName = nameFromPrompt[1].trim();
-				} else {
-					// Look in recent conversation
-					for (let i = conversationHistory.length - 1; i >= 0; i--) {
-						const msg = conversationHistory[i].content;
-						const nameMatch = msg.match(/["'](.*?)["']/) || 
-									   msg.match(/\d+\.\s+(.*?)(?:\n|$)/) ||
-									   msg.match(/\*\*(.*?)\*\*/);
-						
-						if (nameMatch && nameMatch[1]) {
-							strainName = nameMatch[1].trim();
-							break;
-						}
-					}
+				if (nameMatch) {
+					// Find the first non-undefined capture group
+					strainName = nameMatch.slice(1).find(match => match !== undefined) || "";
 				}
 				
 				// Store current prompt
 				currentPrompt = prompt;
 				
-				// Create enhanced prompt for better image generation
-				let enhancedPrompt = strainName ? 
-					`"${strainName}" cannabis strain label design` : 
-					`"${prompt}" cannabis strain label design`;
+				// Create direct image prompt without additional text
+				let imagePrompt = strainName ? 
+					`${strainName} cannabis strain label design` : 
+					`${prompt}`;
 				
 				// Add styles to prompt if selected
 				if (selectedStyles.length > 0) {
 					const styleText = selectedStyles.map(style => style.value).join(', ');
-					enhancedPrompt += `, ${styleText}`;
+					imagePrompt += `, ${styleText}`;
 				}
 				
 				// Create the image URL with parameters
-				const encodedPrompt = encodeURIComponent(enhancedPrompt);
+				const encodedPrompt = encodeURIComponent(imagePrompt);
 				const enhanceParam = enhanceOption.checked ? '&enhance=true' : '';
 				const privateParam = privateOption.checked ? '&private=true' : '';
 				const modelParam = '&model=flux';
 				const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true${enhanceParam}${privateParam}${modelParam}&width=512&height=512&seed=${Math.floor(Math.random() * 1000000)}`;
 				
 				try {
-					showToast("Generating your cannabis strain label" + (strainName ? ` for "${strainName}"` : "") + "...");
+					showToast("Generating your cannabis strain label..." + (strainName ? ` for "${strainName}"` : ""));
 					
 					// Create new image element and set up load/error handlers
 					const img = new Image();
@@ -830,10 +797,10 @@
 						currentImage.src = imageUrl;
 						currentImage.alt = strainName || prompt;
 						
-						// Add the image to the chat
+						// Add the image to the chat with a simple message
 						const messageText = strainName ? 
-							`Here's a label design for "${strainName}"` : 
-							`Here's a label design based on your description`;
+							`Here's your "${strainName}" label design` : 
+							`Here's your label design`;
 						addMessage(messageText, false, imageUrl);
 						
 						// Add download link
