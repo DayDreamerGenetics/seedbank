@@ -805,7 +805,11 @@
 							content: responseText // Keep full response for context
 						});
 						
-						generateImageFromPrompt(imagePrompt);
+						// The key fix - explicitly call generateImageFromPrompt here
+						// and use a small timeout to ensure the UI updates first
+						setTimeout(() => {
+							generateImageFromPrompt(imagePrompt);
+						}, 100);
 					} else {
 						// No image command found
 						addMessage(responseText, false);
@@ -815,6 +819,9 @@
 							role: 'assistant',
 							content: responseText
 						});
+						
+						// Check if user wanted an image despite no explicit command
+						detectImageRequest(userMessage, responseText);
 					}
 					
 				} catch (error) {
