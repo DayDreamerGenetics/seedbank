@@ -77,20 +77,11 @@
               }
             }
           },
-          "male": {
-            "id": "chocolate-pie",
-            "name": "Chocolate Pie",
-            "parents": {
-              "female": {
-                "id": "unknown-female",
-                "name": "Unknown"
-              },
-              "male": {
-                "id": "unknown-male",
-                "name": "Unknown"
-              }
-            }
-          }
+		  "male": {
+		    "id": "chocolate-pie",
+		    "name": "Chocolate Pie",
+		    "description": "A mysterious strain with unknown parentage"
+		  }
         }
       }
     }
