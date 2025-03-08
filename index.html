@@ -631,6 +631,161 @@
 		}
 	}
 
+	/* Strain Explorer Styles */
+	.strain-details-container {
+	  display: flex;
+	  flex-wrap: wrap;
+	  gap: 20px;
+	  margin-top: 10px;
+	}
+
+	.strain-image-container {
+	  flex: 0 0 200px;
+	}
+
+	.strain-details-content {
+	  flex: 1;
+	  min-width: 300px;
+	}
+
+	.strain-meta {
+	  display: grid;
+	  grid-template-columns: 1fr 1fr;
+	  gap: 10px;
+	  margin-top: 15px;
+	  font-size: 0.9rem;
+	}
+
+	.strain-meta p {
+	  margin: 5px 0;
+	  padding: 8px 12px;
+	  border-radius: 4px;
+	  background-color: #2a3c2d;
+	}
+
+	.strain-parentage {
+	  margin: 12px 0;
+	  padding: 10px;
+	  background-color: #3a4d3c;
+	  border-radius: 6px;
+	  font-size: 0.95rem;
+	}
+
+	/* Growing Information Styles */
+	.strain-grow-info {
+	  display: flex;
+	  flex-wrap: wrap;
+	  gap: 10px;
+	  margin: 12px 0;
+	}
+
+	.grow-detail {
+	  display: inline-block;
+	  padding: 6px 10px;
+	  border-radius: 4px;
+	  font-size: 0.85rem;
+	  background-color: #3a7d44;
+	  color: white;
+	  font-weight: 500;
+	}
+
+	.grow-detail.flower-time {
+	  background-color: #3a5a40;
+	}
+
+	.grow-detail.stretch-low {
+	  background-color: #4aa04a;
+	}
+
+	.grow-detail.stretch-medium {
+	  background-color: #f9c74f;
+	  color: #1e2b20;
+	}
+
+	.grow-detail.stretch-high {
+	  background-color: #e76f51;
+	}
+
+	.grow-detail.seed-type {
+	  background-color: #6fb97a;
+	  color: #1e2b20;
+	  font-weight: bold;
+	}
+
+	/* Strain Card Enhancements */
+	.strain-badges {
+	  position: absolute;
+	  top: 10px;
+	  right: 10px;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 5px;
+	  z-index: 5;
+	}
+
+	.strain-type {
+	  display: inline-block;
+	  padding: 4px 8px;
+	  background-color: var(--primary);
+	  color: white;
+	  border-radius: 4px;
+	  font-size: 0.8rem;
+	  text-transform: uppercase;
+	  font-weight: bold;
+	}
+
+	.seed-type-badge {
+	  display: inline-block;
+	  padding: 4px 8px;
+	  border-radius: 4px;
+	  font-size: 0.8rem;
+	  text-transform: uppercase;
+	  font-weight: bold;
+	  background-color: #4d7c59;
+	  color: white;
+	}
+
+	.seed-type-badge.feminized {
+	  background-color: #f9c74f;
+	  color: #1e2b20;
+	}
+
+	.seed-type-badge.regular {
+	  background-color: #4d7c59;
+	  color: white;
+	}
+
+	.strain-image {
+	  position: relative;
+	}
+
+	.strain-genetics {
+	  font-size: 0.85rem;
+	  color: #cccccc;
+	  margin-bottom: 10px;
+	  font-style: italic;
+	}
+
+	.strain-seed-count {
+	  font-size: 0.85rem;
+	  color: #cccccc;
+	}
+
+	/* Responsive adjustments */
+	@media (max-width: 768px) {
+	  .strain-meta {
+		grid-template-columns: 1fr;
+	  }
+	  
+	  .strain-details-container {
+		flex-direction: column;
+	  }
+	  
+	  .strain-grow-info {
+		justify-content: center;
+	  }
+	}
+
 	@media (max-width: 768px) {
 		.nav-container {
 			flex-direction: column;
@@ -1046,77 +1201,168 @@
 		}
 
 		function populateStrainCatalog() {
-			const strainGrid = document.getElementById('strain-grid');
+		  const strainGrid = document.getElementById('strain-grid');
+		  
+		  // Clear existing strains
+		  strainGrid.innerHTML = '';
+		  
+		  // Get strain data from your JSON
+		  fetchStrainData().then(data => {
+			// Get all strains from the data
+			const strains = data.strains || [];
 			
-			// Clear existing strains
-			strainGrid.innerHTML = '';
+			if (strains.length === 0) {
+			  strainGrid.innerHTML = '<p class="no-strains">No strains found in catalog.</p>';
+			  return;
+			}
 			
-			// Get strain data from your JSON
-			fetchStrainData().then(data => {
-				// Get all strains from the data
-				const strains = data.strains || [];
+			// Create a card for each strain
+			strains.forEach(strain => {
+			  // Create strain card
+			  const card = document.createElement('div');
+			  card.className = 'strain-card';
+			  
+			  // Get image path from strain data structure or fallback to default pattern
+			  const imagePath = strain.images && strain.images.main 
+				? `img/${strain.images.main}` 
+				: `img/${strain.id}-main.jpg`;
+			  
+			  // Get the proper dominance term (use HYBRID instead of balanced)
+			  let dominanceType = strain.dominance || 'hybrid';
+			  if (dominanceType.toLowerCase() === 'balanced') {
+				dominanceType = 'hybrid';
+			  }
+			  
+			  // Create seedType text based on the feminized property or the new seedType property
+			  let seedTypeText = "Unknown";
+			  if (strain.seedType) {
+				seedTypeText = strain.seedType.toUpperCase();
+			  } else if (strain.feminized !== undefined) {
+				seedTypeText = strain.feminized ? "FEMINIZED" : "REGULAR";
+			  }
+			  
+			  // Format parent information if available
+			  let parentageHTML = '';
+			  if (strain.parentage) {
+				parentageHTML = `
+				  <div class="strain-genetics">
+					${strain.parentage.female.name} × ${strain.parentage.male.name}
+				  </div>
+				`;
+			  }
+			  
+			  // Add grow info if available
+			  let growInfoHTML = '';
+			  if (strain.flowerTime || strain.stretch) {
+				growInfoHTML = `
+				  <div class="strain-grow-info">
+					${strain.flowerTime ? `<span class="grow-detail flower-time">🌸 ${strain.flowerTime}</span>` : ''}
+					${strain.stretch ? `<span class="grow-detail stretch-${strain.stretch.toLowerCase()}">📏 ${strain.stretch}</span>` : ''}
+				  </div>
+				`;
+			  }
+			  
+			  // Create HTML for the card
+			  card.innerHTML = `
+				<div class="strain-image">
+				  <img src="${imagePath}" alt="${strain.name}" onerror="this.src='img/placeholder-strain.jpg'">
+				  <div class="strain-badges">
+					<div class="strain-type">${dominanceType.toUpperCase()}</div>
+					<div class="seed-type-badge ${seedTypeText.toLowerCase()}">${seedTypeText}</div>
+				  </div>
+				</div>
+				<div class="strain-card-content">
+				  <h3>${strain.name}</h3>
+				  ${parentageHTML}
+				  <p class="strain-description">${strain.description}</p>
+				  ${growInfoHTML}
+				  <div class="strain-details">
+					<div class="strain-availability">${strain.availabilityStatus || 'Unknown'}</div>
+					${strain.seedCount ? `<div class="strain-seed-count">${strain.seedCount} seeds</div>` : ''}
+				  </div>
+				</div>
+			  `;
+			  
+			  // Add card to grid
+			  strainGrid.appendChild(card);
+			  
+			  // Add click event to view strain details
+			  card.addEventListener('click', function() {
+				// Navigate to the strain explorer section
+				navigateToSection('explorer');
 				
-				if (strains.length === 0) {
-					strainGrid.innerHTML = '<p class="no-strains">No strains found in catalog.</p>';
-					return;
+				// Find the strain node in the tree and trigger a click on it
+				highlightStrainInExplorer(strain.name);
+			  });
+			});
+			
+			// Add filter functionality
+			const typeFilter = document.getElementById('type-filter');
+			typeFilter.addEventListener('change', function() {
+			  const filterValue = this.value;
+			  
+			  document.querySelectorAll('.strain-card').forEach(card => {
+				if (filterValue === 'all') {
+				  card.style.display = 'block';
+				  return;
 				}
 				
-				// Create a card for each strain
-				strains.forEach(strain => {
-					// Create strain card
-					const card = document.createElement('div');
-					card.className = 'strain-card';
-					
-					// Image path - use strain id to find the image
-					const imagePath = `img/${strain.id}-main.jpg`;
-					
-					// Get the proper dominance term (use HYBRID instead of balanced)
-					let dominanceType = strain.dominance || 'hybrid';
-					if (dominanceType.toLowerCase() === 'balanced') {
-						dominanceType = 'hybrid';
-					}
-					
-					// Create HTML for the card - with full description
-					card.innerHTML = `
-						<div class="strain-image">
-							<img src="${imagePath}" alt="${strain.name}" onerror="this.src='img/placeholder-strain.jpg'">
-						</div>
-						<div class="strain-card-content">
-							<h3>${strain.name}</h3>
-							<div class="strain-type">${dominanceType.toUpperCase()}</div>
-							<p class="strain-description">${strain.description}</p>
-							<div class="strain-details">
-							  <div class="strain-availability">${strain.availabilityStatus || 'Unknown'}</div>
-							</div>
-						</div>
-					`;
-					
-					// Add card to grid
-					strainGrid.appendChild(card);
-					
-					// Add click event to view strain details
-					card.addEventListener('click', function() {
-						// Show strain description
-						document.getElementById('strain-description').innerText = strain.description || "No information available for this strain.";
-					});
-				});
-				
-				// Add filter functionality
-				const typeFilter = document.getElementById('type-filter');
-				typeFilter.addEventListener('change', function() {
-					const filterValue = this.value;
-					
-					document.querySelectorAll('.strain-card').forEach(card => {
-						if (filterValue === 'all') {
-							card.style.display = 'block';
-							return;
-						}
-						
-						const type = card.querySelector('.strain-type').textContent;
-						card.style.display = type.toLowerCase().includes(filterValue.toLowerCase()) ? 'block' : 'none';
-					});
-				});
+				const type = card.querySelector('.strain-type').textContent;
+				card.style.display = type.toLowerCase().includes(filterValue.toLowerCase()) ? 'block' : 'none';
+			  });
 			});
+		  });
+		}
+
+		function highlightStrainInExplorer(strainName) {
+		  if (!root) return;
+		  
+		  // Find the node with the matching name
+		  let targetNode = null;
+		  
+		  function findNode(node) {
+			if (node.data.name === strainName) {
+			  targetNode = node;
+			  return true;
+			}
+			
+			if (node.children) {
+			  for (let child of node.children) {
+				if (findNode(child)) return true;
+			  }
+			}
+			
+			if (node._children) {
+			  for (let child of node._children) {
+				if (findNode(child)) return true;
+			  }
+			}
+			
+			return false;
+		  }
+		  
+		  findNode(root);
+		  
+		  if (targetNode) {
+			// Expand all parent nodes to make sure the target is visible
+			let current = targetNode.parent;
+			while (current) {
+			  if (current._children) {
+				current.children = current._children;
+				current._children = null;
+			  }
+			  current = current.parent;
+			}
+			
+			// Update the tree to reflect the expanded state
+			update(root);
+			
+			// Trigger a click on the target node to show its details
+			click({ target: targetNode }, targetNode);
+			
+			// Scroll to the strain info section
+			document.getElementById('strain-description').scrollIntoView({ behavior: 'smooth' });
+		  }
 		}
 		
 		function navigateToSection(sectionId) {
@@ -1179,7 +1425,7 @@
 						"name": "Tangerine Truffle",
 						"breedingType": "F1",
 						"type": "photoperiod",
-						"dominance": "sativa-dominant",
+						"dominance": "indica-dominant",
 						"description": "Tangerine Truffle combines citrus notes with deep chocolate undertones. This sativa-dominant hybrid provides an uplifting, creative high perfect for daytime use.",
 						"availabilityStatus": "in-stock"
 					},
@@ -1512,59 +1758,99 @@
 					  ${d.y} ${d.x}`;
 		}
 
-		// Update the click handler in your D3 visualization
+		// Toggle children on click and display strain information
 		function click(event, d) {
-			try {
-				if (d.children) {
-					d._children = d.children;
-					d.children = null;
-				} else {
-					d.children = d._children;
-					d._children = null;
+		  try {
+			if (d.children) {
+			  d._children = d.children;
+			  d.children = null;
+			} else {
+			  d.children = d._children;
+			  d._children = null;
+			}
+			
+			// Update the tree
+			update(d);
+			
+			// Find the strain data to display more information
+			fetchStrainData().then(data => {
+			  const strainName = d.data.name;
+			  const strain = data.strains.find(s => s.name === strainName);
+			  
+			  if (strain) {
+				// Show comprehensive strain info with image
+				const strainInfoEl = document.getElementById('strain-description');
+				
+				// Get image path from strain data structure or fallback to default pattern
+				const imagePath = strain.images && strain.images.main 
+				  ? `img/${strain.images.main}` 
+				  : `img/${strain.id}-main.jpg`;
+				
+				// Create seedType text based on the feminized property or the new seedType property
+				let seedTypeText = "Unknown";
+				if (strain.seedType) {
+				  seedTypeText = strain.seedType.toUpperCase();
+				} else if (strain.feminized !== undefined) {
+				  seedTypeText = strain.feminized ? "FEMINIZED" : "REGULAR";
 				}
 				
-				// Update the tree
-				update(d);
+				// Format parent information if available
+				let parentageHTML = '';
+				if (strain.parentage) {
+				  parentageHTML = `
+					<div class="strain-parentage">
+					  <p><strong>Genetics:</strong> ${strain.parentage.female.name} × ${strain.parentage.male.name}</p>
+					</div>
+				  `;
+				}
 				
-				// Find the strain data to display more information
-				fetchStrainData().then(data => {
-					const strainName = d.data.name;
-					const strain = data.strains.find(s => s.name === strainName);
-					
-					if (strain) {
-						// Show comprehensive strain info with image
-						const strainInfoEl = document.getElementById('strain-description');
-						const imagePath = `img/${strain.id}-main.jpg`;
-						
-						strainInfoEl.innerHTML = `
-							<div class="strain-details-container">
-								<div class="strain-image-container">
-									<img src="${imagePath}" alt="${strain.name}" 
-										 onerror="this.src='img/placeholder-strain.jpg'"
-										 style="max-width: 200px; border-radius: 8px;">
-								</div>
-								<div class="strain-details-content">
-									<h3>${strain.name}</h3>
-									<div class="strain-type">${strain.dominance || 'hybrid'}</div>
-									<p>${strain.description}</p>
-									<div class="strain-meta">
-										<p>Type: ${strain.type || 'photoperiod'}</p>
-										<p>Status: ${strain.availabilityStatus || 'Unknown'}</p>
-										${strain.feminized ? '<p>Feminized: Yes</p>' : ''}
-										${strain.seedCount ? `<p>Seed Count: ${strain.seedCount}</p>` : ''}
-									</div>
-								</div>
-							</div>
-						`;
-					} else {
-						// Fallback to simple description
-						document.getElementById('strain-description').innerText = 
-							strainDescriptions[d.data.name] || "No information available for this strain.";
-					}
-				});
-			} catch (error) {
-				console.error("Error in click handler:", error);
-			}
+				// Add grow info badges with proper styling
+				let growInfoHTML = '';
+				if (strain.flowerTime || strain.stretch) {
+				  growInfoHTML = `
+					<div class="strain-grow-info">
+					  ${strain.flowerTime ? `<span class="grow-detail flower-time">🌸 ${strain.flowerTime}</span>` : ''}
+					  ${strain.stretch ? `<span class="grow-detail stretch-${strain.stretch.toLowerCase()}">📏 ${strain.stretch}</span>` : ''}
+					  <span class="grow-detail seed-type">${seedTypeText}</span>
+					</div>
+				  `;
+				}
+				
+				strainInfoEl.innerHTML = `
+				  <div class="strain-details-container">
+					<div class="strain-image-container">
+					  <img src="${imagePath}" alt="${strain.name}" 
+						   onerror="this.src='img/placeholder-strain.jpg'"
+						   style="max-width: 200px; border-radius: 8px;">
+					</div>
+					<div class="strain-details-content">
+					  <h3>${strain.name}</h3>
+					  <div class="strain-type">${strain.dominance || 'hybrid'}</div>
+					  
+					  ${growInfoHTML}
+					  
+					  <p>${strain.description}</p>
+					  
+					  ${parentageHTML}
+					  
+					  <div class="strain-meta">
+						<p><strong>Type:</strong> ${strain.type || 'photoperiod'}</p>
+						<p><strong>Status:</strong> ${strain.availabilityStatus || 'Unknown'}</p>
+						${strain.generation ? `<p><strong>Generation:</strong> ${strain.generation}</p>` : ''}
+						${strain.seedCount ? `<p><strong>Seeds per Pack:</strong> ${strain.seedCount}</p>` : ''}
+					  </div>
+					</div>
+				  </div>
+				`;
+			  } else {
+				// Fallback to simple description
+				document.getElementById('strain-description').innerText = 
+				  strainDescriptions[d.data.name] || "No information available for this strain.";
+			  }
+			});
+		  } catch (error) {
+			console.error("Error in click handler:", error);
+		  }
 		}
 		
 		// Function to safely load strain images with fallbacks
