@@ -6,7 +6,7 @@
     <title>Daydreamer Genetics - Strain Lineage Explorer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
+<style>
         :root {
             --primary: #3a7d44;      /* Darker green */
             --secondary: #6fb97a;    /* Lighter green */
@@ -74,12 +74,14 @@
             overflow: hidden;
         }
 
-		.tree-container {
-			width: 100%;
-			height: 800px;
-			overflow: auto; /* Change from 'overflow: auto' to explicitly set both directions */
-			position: relative;
-		}
+        .tree-container {
+            width: 100%;
+            height: 800px;
+            overflow: auto;
+            position: relative;
+            background-color: var(--dark);
+            border-radius: 6px;
+        }
 
         .sidebar {
             background-color: var(--dark);
@@ -189,34 +191,61 @@
             fill: var(--secondary);
             stroke: var(--primary);
             stroke-width: 2px;
+            transition: fill 0.3s, stroke 0.3s, stroke-width 0.3s;
+        }
+
+        .node:hover circle {
+            stroke-width: 3px;
+            stroke: var(--accent);
+        }
+
+        .node.selected circle {
+            stroke-width: 4px;
+            stroke: var(--accent);
         }
 
         .node text {
             font: 12px sans-serif;
             fill: var(--light);
+            pointer-events: none; /* Make text non-blocking for mouse events */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8); /* Make text more readable */
         }
 
-        .node--internal circle {
-            fill: #555;
+        /* Customize node colors based on type */
+        .node--female circle, .node[data-type="female"] circle {
+            fill: #e76f51;
+        }
+
+        .node--male circle, .node[data-type="male"] circle {
+            fill: #4895ef;
+        }
+
+        .node--strain circle, .node[data-type="strain"] circle {
+            fill: #3a7d44;
+        }
+
+        .node--unknown circle {
+            fill: #888;
         }
 
         .link {
             fill: none;
-            stroke: #ccc;
-            stroke-width: 2px;
+            stroke: rgba(204, 204, 204, 0.6);
+            stroke-width: 1.5px;
         }
 
         .tooltip {
             position: absolute;
             padding: 10px;
-            background-color: rgba(30,43,32,0.9);
-            border: 1px solid #3a7d44;
+            background-color: rgba(30,43,32,0.95);
+            border: 1px solid var(--primary);
             border-radius: 6px;
             pointer-events: none;
             font-size: 0.85rem;
             max-width: 300px;
             z-index: 100;
             display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         .tooltip h3 {
@@ -289,6 +318,38 @@
 
         #fileInput {
             display: none;
+        }
+
+        /* Tree navigation controls */
+        .tree-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            background-color: rgba(30,43,32,0.8);
+            padding: 8px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+
+        .tree-control-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tree-control-btn:hover {
+            background-color: var(--secondary);
+            color: var(--dark);
         }
 
         @media (max-width: 992px) {
@@ -451,24 +512,18 @@
 			const width = document.getElementById('tree-container').clientWidth;
 			const height = document.getElementById('tree-container').clientHeight;
 			
-			// Create the main SVG element
+			// Create the SVG container with zoom capability
 			const svgContainer = d3.select('#tree-container')
 				.append('svg')
 				.attr('width', width)
 				.attr('height', height);
 			
-			// Add zoom behavior
-			const zoom = d3.zoom()
-				.scaleExtent([0.1, 3])
-				.on('zoom', (event) => {
-					svg.attr('transform', event.transform);
-				});
-			
-			svgContainer.call(zoom);
-			
-			// Create the main group that will be transformed when zooming
+			// Create the main group for the tree
 			svg = svgContainer.append('g')
 				.attr('transform', 'translate(40,0)');
+			
+			// Add navigation controls
+			addTreeControls();
 			
 			// Create tooltip
 			const tooltip = d3.select('#tooltip');
@@ -476,98 +531,273 @@
 			// Initialize with sample data
 			loadSampleData();
 		}
+
+		// Add navigation controls to the tree container
+		function addTreeControls() {
+			const treeContainer = document.getElementById('tree-container');
+			
+			// Create control container
+			const controlsDiv = document.createElement('div');
+			controlsDiv.className = 'tree-controls';
+			
+			// Zoom in button
+			const zoomInBtn = document.createElement('button');
+			zoomInBtn.className = 'tree-control-btn';
+			zoomInBtn.innerHTML = '<i class="fas fa-plus"></i>';
+			zoomInBtn.title = 'Zoom In';
+			zoomInBtn.addEventListener('click', () => zoomTree(1.2));
+			
+			// Zoom out button
+			const zoomOutBtn = document.createElement('button');
+			zoomOutBtn.className = 'tree-control-btn';
+			zoomOutBtn.innerHTML = '<i class="fas fa-minus"></i>';
+			zoomOutBtn.title = 'Zoom Out';
+			zoomOutBtn.addEventListener('click', () => zoomTree(0.8));
+			
+			// Reset view button
+			const resetBtn = document.createElement('button');
+			resetBtn.className = 'tree-control-btn';
+			resetBtn.innerHTML = '<i class="fas fa-home"></i>';
+			resetBtn.title = 'Reset View';
+			resetBtn.addEventListener('click', resetTreeView);
+			
+			// Fit to view button
+			const fitBtn = document.createElement('button');
+			fitBtn.className = 'tree-control-btn';
+			fitBtn.innerHTML = '<i class="fas fa-expand"></i>';
+			fitBtn.title = 'Fit to View';
+			fitBtn.addEventListener('click', fitTreeToView);
+			
+			// Add buttons to control container
+			controlsDiv.appendChild(zoomInBtn);
+			controlsDiv.appendChild(zoomOutBtn);
+			controlsDiv.appendChild(resetBtn);
+			controlsDiv.appendChild(fitBtn);
+			
+			// Add controls to tree container
+			treeContainer.appendChild(controlsDiv);
+		}
+
+		// Enhanced node click handler
+		function handleNodeClick(event, d) {
+			// Display strain information
+			displayStrainDetails(d.data);
+			
+			// Highlight this node in the tree
+			d3.selectAll('.node').classed('selected', false);
+			d3.select(event.currentTarget).classed('selected', true);
+			
+			// Center view on this node with animation
+			centerOnNode(d);
+		}
+
+		// Zoom the tree by a given scale factor
+		function zoomTree(scaleFactor) {
+			const svgElement = d3.select('#tree-container svg');
+			const currentTransform = d3.zoomTransform(svgElement.node());
+			
+			// Calculate new scale based on current scale
+			const newScale = currentTransform.k * scaleFactor;
+			
+			// Create zoom behavior
+			const zoom = d3.zoom().scaleExtent([0.1, 3]);
+			
+			// Apply zoom transform
+			svgElement.transition().duration(300).call(
+				zoom.transform,
+				d3.zoomIdentity
+					.translate(currentTransform.x, currentTransform.y)
+					.scale(newScale)
+			);
+		}
+
+		// Reset the tree view to default
+		function resetTreeView() {
+			const svgElement = d3.select('#tree-container svg');
+			const zoom = d3.zoom().scaleExtent([0.1, 3]);
+			
+			svgElement.transition().duration(500).call(
+				zoom.transform,
+				d3.zoomIdentity
+			);
+		}
+
+		// Fit the tree to the view
+		function fitTreeToView() {
+			if (!root) return;
+			
+			const svgElement = d3.select('#tree-container svg');
+			const svgNode = svgElement.node();
+			const zoom = d3.zoom().scaleExtent([0.1, 3]);
+			
+			// Get the bounds of the tree
+			const bounds = svg.node().getBBox();
+			
+			// Calculate the scale and translation to fit the tree
+			const containerWidth = svgNode.clientWidth;
+			const containerHeight = svgNode.clientHeight;
+			
+			const scale = Math.min(
+				0.9 * containerWidth / bounds.width,
+				0.9 * containerHeight / bounds.height
+			);
+			
+			const translateX = (containerWidth - bounds.width * scale) / 2 - bounds.x * scale;
+			const translateY = (containerHeight - bounds.height * scale) / 2 - bounds.y * scale;
+			
+			// Apply the transform
+			svgElement.transition().duration(500).call(
+				zoom.transform,
+				d3.zoomIdentity
+					.translate(translateX, translateY)
+					.scale(scale)
+			);
+		}
+
+		// Center the view on a specific node
+		function centerOnNode(d) {
+			const svgElement = d3.select('#tree-container svg');
+			const svgNode = svgElement.node();
+			const zoom = d3.zoom().scaleExtent([0.1, 3]);
+			
+			// Get the current transform
+			const currentTransform = d3.zoomTransform(svgNode);
+			
+			// Calculate the translation needed to center on the node
+			const scale = currentTransform.k || 1;
+			const targetX = -d.y * scale + svgNode.clientWidth / 2;
+			const targetY = -d.x * scale + svgNode.clientHeight / 2;
+			
+			// Apply the transform with animation
+			svgElement.transition().duration(500).call(
+				zoom.transform,
+				d3.zoomIdentity
+					.translate(targetX, targetY)
+					.scale(scale)
+			);
+		}
         
-        function updateTreeLayout() {
-            const width = document.getElementById('tree-container').clientWidth;
-            const height = document.getElementById('tree-container').clientHeight;
-            
-            // Clear previous tree
-            svg.selectAll('*').remove();
-            
-            // Create appropriate tree layout based on orientation
-            if (currentOrientation === 'horizontal') {
-                treeLayout = d3.tree().size([height - 100, width - 160]);
-                
-                // Define a diagonal generator for links
-                const diagonal = d3.linkHorizontal()
-                    .x(d => d.y)
-                    .y(d => d.x);
-                
-                // Compute the tree layout
-                treeLayout(root);
-                
-                // Add links
-                svg.selectAll('path.link')
-                    .data(root.links())
-                    .enter().append('path')
-                    .attr('class', 'link')
-                    .attr('d', diagonal);
-                
-                // Add nodes
-                const nodes = svg.selectAll('g.node')
-                    .data(root.descendants())
-                    .enter().append('g')
-                    .attr('class', d => 'node ' + (d.children ? 'node--internal' : 'node--leaf'))
-                    .attr('transform', d => `translate(${d.y},${d.x})`)
-                    .on('click', handleNodeClick)
-                    .on('mouseover', showNodeTooltip)
-                    .on('mouseout', hideNodeTooltip);
-                
-                // Add circles to nodes
-                nodes.append('circle')
-                    .attr('r', 8)
-                    .style('fill', d => getNodeColor(d));
-                
-                // Add labels to nodes
-                nodes.append('text')
-                    .attr('dy', '.31em')
-                    .attr('x', d => d.children ? -12 : 12)
-                    .style('text-anchor', d => d.children ? 'end' : 'start')
-                    .text(d => d.data.name);
-                
-            } else {
-                // Vertical layout
-                treeLayout = d3.tree().size([width - 100, height - 160]);
-                
-                // Define a diagonal generator for links
-                const diagonal = d3.linkVertical()
-                    .x(d => d.x)
-                    .y(d => d.y);
-                
-                // Compute the tree layout
-                treeLayout(root);
-                
-                // Add links
-                svg.selectAll('path.link')
-                    .data(root.links())
-                    .enter().append('path')
-                    .attr('class', 'link')
-                    .attr('d', diagonal);
-                
-                // Add nodes
-                const nodes = svg.selectAll('g.node')
-                    .data(root.descendants())
-                    .enter().append('g')
-                    .attr('class', d => 'node ' + (d.children ? 'node--internal' : 'node--leaf'))
-                    .attr('transform', d => `translate(${d.x},${d.y})`)
-                    .on('click', handleNodeClick)
-                    .on('mouseover', showNodeTooltip)
-                    .on('mouseout', hideNodeTooltip);
-                
-                // Add circles to nodes
-                nodes.append('circle')
-                    .attr('r', 8)
-                    .style('fill', d => getNodeColor(d));
-                
-                // Add labels to nodes
-                nodes.append('text')
-                    .attr('dy', '-.5em')
-                    .attr('x', 0)
-                    .style('text-anchor', 'middle')
-                    .text(d => d.data.name)
-                    .call(wrap, 120);
-            }
-        }
+		function updateTreeLayout() {
+			const width = document.getElementById('tree-container').clientWidth;
+			const height = document.getElementById('tree-container').clientHeight;
+			
+			// Clear previous tree
+			svg.selectAll('*').remove();
+			
+			// Create appropriate tree layout based on orientation
+			if (currentOrientation === 'horizontal') {
+				// Use a more compact horizontal tree layout with reduced spacing
+				treeLayout = d3.tree()
+					.size([height - 100, width - 160])
+					.separation((a, b) => (a.parent === b.parent ? 1 : 1.2));
+				
+				// Define a diagonal generator for links
+				const diagonal = d3.linkHorizontal()
+					.x(d => d.y)
+					.y(d => d.x);
+				
+				// Compute the tree layout
+				treeLayout(root);
+				
+				// Compress the horizontal spacing to make the tree more compact
+				root.descendants().forEach(d => {
+					// Scale the y position to reduce horizontal spacing
+					d.y = d.depth * 120; // Reduce from default 180 to 120
+				});
+				
+				// Add links
+				svg.selectAll('path.link')
+					.data(root.links())
+					.enter().append('path')
+					.attr('class', 'link')
+					.attr('d', diagonal);
+				
+				// Add nodes
+				const nodes = svg.selectAll('g.node')
+					.data(root.descendants())
+					.enter().append('g')
+					.attr('class', d => 'node ' + (d.children ? 'node--internal' : 'node--leaf'))
+					.attr('transform', d => `translate(${d.y},${d.x})`)
+					.attr('data-type', d => d.data.nodeType || 'unknown')
+					.on('click', handleNodeClick)
+					.on('mouseover', showNodeTooltip)
+					.on('mouseout', hideNodeTooltip);
+				
+				// Add circles to nodes
+				nodes.append('circle')
+					.attr('r', 8)
+					.style('fill', d => getNodeColor(d));
+				
+				// Add labels to nodes
+				nodes.append('text')
+					.attr('dy', '.31em')
+					.attr('x', d => d.children ? -12 : 12)
+					.style('text-anchor', d => d.children ? 'end' : 'start')
+					.text(d => d.data.name);
+				
+			} else {
+				// Vertical layout
+				// Use a more compact vertical tree layout with reduced spacing
+				treeLayout = d3.tree()
+					.size([width - 100, height - 160])
+					.separation((a, b) => (a.parent === b.parent ? 1 : 1.2));
+				
+				// Define a diagonal generator for links
+				const diagonal = d3.linkVertical()
+					.x(d => d.x)
+					.y(d => d.y);
+				
+				// Compute the tree layout
+				treeLayout(root);
+				
+				// Compress the vertical spacing to make the tree more compact
+				root.descendants().forEach(d => {
+					// Scale the y position to reduce vertical spacing
+					d.y = d.depth * 80; // Reduce vertical spacing
+				});
+				
+				// Add links
+				svg.selectAll('path.link')
+					.data(root.links())
+					.enter().append('path')
+					.attr('class', 'link')
+					.attr('d', diagonal);
+				
+				// Add nodes
+				const nodes = svg.selectAll('g.node')
+					.data(root.descendants())
+					.enter().append('g')
+					.attr('class', d => 'node ' + (d.children ? 'node--internal' : 'node--leaf'))
+					.attr('transform', d => `translate(${d.x},${d.y})`)
+					.attr('data-type', d => d.data.nodeType || 'unknown')
+					.on('click', handleNodeClick)
+					.on('mouseover', showNodeTooltip)
+					.on('mouseout', hideNodeTooltip);
+				
+				// Add circles to nodes
+				nodes.append('circle')
+					.attr('r', 8)
+					.style('fill', d => getNodeColor(d));
+				
+				// Add labels to nodes
+				nodes.append('text')
+					.attr('dy', '-.5em')
+					.attr('x', 0)
+					.style('text-anchor', 'middle')
+					.text(d => d.data.name)
+					.call(wrap, 120);
+			}
+			
+			// Add pan and zoom capability
+			const svgElement = d3.select('#tree-container svg');
+			svgElement.call(
+				d3.zoom()
+					.scaleExtent([0.5, 3])
+					.on('zoom', (event) => {
+						svg.attr('transform', event.transform);
+					})
+			);
+		}
         
         function getNodeColor(d) {
             // Color coding based on node type
