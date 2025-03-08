@@ -6,285 +6,329 @@
     <title>Daydreamer Genetics - Pollen Inventory</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        :root {
-            --primary: #3a7d44;      /* Darker green */
-            --secondary: #6fb97a;    /* Lighter green */
-            --accent: #f9c74f;       /* Amber/gold */
-            --dark: #1e2b20;         /* Very dark green, almost black */
-            --light: #f2f7f3;        /* Very light green-tinted white */
-            --background: #1e2b20;   /* Dark background */
-            --text: #f2f7f3;         /* Light text */
-            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --fem-color: #f9c74f;    /* Color for feminized pollen */
-            --reg-color: #4d7c59;    /* Color for regular pollen */
-        }
+	<style>
+		:root {
+			--primary: #3a7d44;      /* Darker green */
+			--secondary: #6fb97a;    /* Lighter green */
+			--accent: #f9c74f;       /* Amber/gold */
+			--dark: #1e2b20;         /* Very dark green, almost black */
+			--light: #f2f7f3;        /* Very light green-tinted white */
+			--background: #1e2b20;   /* Dark background */
+			--text: #f2f7f3;         /* Light text */
+			--font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			--fem-color: #f9c74f;    /* Color for feminized pollen */
+			--reg-color: #4d7c59;    /* Color for regular pollen */
+		}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
 
-        body {
-            font-family: var(--font-main);
-            line-height: 1.6;
-            color: var(--light);
-            background-color: var(--background);
-            padding: 20px;
-        }
+		body {
+			font-family: var(--font-main);
+			line-height: 1.6;
+			color: var(--light);
+			background-color: var(--background);
+			padding: 20px;
+		}
 
-        a {
-            color: var(--secondary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
+		a {
+			color: var(--secondary);
+			text-decoration: none;
+			transition: all 0.3s ease;
+		}
 
-        a:hover {
-            color: var(--accent);
-        }
+		a:hover {
+			color: var(--accent);
+		}
 
-        header {
-            background-color: var(--dark);
-            padding: 20px;
-            margin-bottom: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+		header {
+			background-color: var(--dark);
+			padding: 20px;
+			margin-bottom: 30px;
+			border-radius: 8px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+		}
 
-        h1 {
-            color: var(--light);
-            margin-bottom: 10px;
-        }
+		h1 {
+			color: var(--light);
+			margin-bottom: 10px;
+		}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+		.container {
+			max-width: 1400px;
+			margin: 0 auto;
+		}
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 20px;
-        }
+		.main-content {
+			display: grid;
+			grid-template-columns: 1fr 300px;
+			gap: 20px;
+		}
 
-        .pollen-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
+		.pollen-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+			gap: 20px;
+		}
 
-        .pollen-card {
-            background-color: var(--dark);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease;
-            position: relative;
-        }
+		.pollen-card {
+			background-color: var(--dark);
+			border-radius: 8px;
+			overflow: hidden;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			transition: transform 0.3s ease;
+			position: relative;
+		}
 
-        .pollen-card:hover {
-            transform: translateY(-5px);
-        }
+		.pollen-card:hover {
+			transform: translateY(-5px);
+		}
 
-        .pollen-header {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            position: relative;
-        }
+		.pollen-header {
+			padding: 15px;
+			border-bottom: 1px solid rgba(255,255,255,0.1);
+			position: relative;
+		}
 
-        .pollen-card h3 {
-            margin-bottom: 5px;
-            padding-right: 60px;
-        }
+		.pollen-card h3 {
+			margin-bottom: 5px;
+		}
 
-        .pollen-type {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
+		/* Fix for the pollen type labels */
+		.pollen-tags {
+			margin-top: 8px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+		}
 
-        .pollen-type.feminized {
-            background-color: var(--fem-color);
-            color: var(--dark);
-        }
+		.pollen-type {
+			display: inline-block;
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-size: 0.8rem;
+			text-transform: uppercase;
+			font-weight: bold;
+		}
 
-        .pollen-type.regular {
-            background-color: var(--reg-color);
-            color: var(--light);
-        }
+		/* Different styles for different types */
+		.pollen-type.feminized {
+			background-color: #f9c74f; /* Yellow/gold */
+			color: #1e2b20;           /* Dark text for contrast */
+		}
 
-        .pollen-content {
-            padding: 15px;
-        }
+		.pollen-type.regular {
+			background-color: #4d7c59; /* Green */
+			color: #f2f7f3;           /* Light text for contrast */
+		}
 
-        .pollen-description {
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-        }
+		/* Grow type styles */
+		.pollen-type.photoperiod {
+			background-color: #4895ef; /* Blue */
+			color: #f2f7f3;           /* Light text */
+		}
 
-        .pollen-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            font-size: 0.9rem;
-        }
+		.pollen-type.autoflower {
+			background-color: #e76f51; /* Orange */
+			color: #f2f7f3;           /* Light text */
+		}
 
-        .pollen-details p {
-            padding: 5px 10px;
-            background-color: rgba(255,255,255,0.05);
-            border-radius: 4px;
-        }
+		/* Breeding method styles */
+		.breeding-ff {
+			background-color: #5b8c5a; /* Darker green */
+			color: white;
+		}
 
-        .pollen-footer {
-            padding: 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+		.breeding-self {
+			background-color: #9381ff; /* Purple */
+			color: white;
+		}
 
-        .availability {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+		.breeding-reversed {
+			background-color: #ff70a6; /* Pink */
+			color: white;
+		}
 
-        .availability-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
+		.breeding-bx {
+			background-color: #43aa8b; /* Teal */
+			color: white;
+		}
 
-        .available {
-            background-color: #4aa04a;
-        }
+		.pollen-content {
+			padding: 15px;
+		}
 
-        .limited {
-            background-color: var(--accent);
-        }
+		.pollen-description {
+			margin-bottom: 15px;
+			font-size: 0.9rem;
+		}
 
-        .unavailable {
-            background-color: #e76f51;
-        }
+		.pollen-details {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px;
+			font-size: 0.9rem;
+		}
 
-        .relative-btn {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: var(--primary);
-            border-radius: 4px;
-            font-size: 0.8rem;
-            transition: all 0.3s;
-        }
+		.pollen-details p {
+			padding: 5px 10px;
+			background-color: rgba(255,255,255,0.05);
+			border-radius: 4px;
+		}
 
-        .relative-btn:hover {
-            background-color: var(--secondary);
-            color: var(--dark);
-        }
+		.pollen-footer {
+			padding: 15px;
+			border-top: 1px solid rgba(255,255,255,0.1);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
 
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+		.availability {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
 
-        .filter-section {
-            background-color: var(--dark);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
+		.availability-indicator {
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+		}
 
-        .filter-section h3 {
-            margin-bottom: 15px;
-            color: var(--accent);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
-        }
+		.available {
+			background-color: #4aa04a;
+		}
 
-        .filter-group {
-            margin-bottom: 15px;
-        }
+		.limited {
+			background-color: var(--accent);
+		}
 
-        .filter-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
+		.unavailable {
+			background-color: #e76f51;
+		}
 
-        .filter-group select, .filter-group input {
-            width: 100%;
-            padding: 8px 10px;
-            background-color: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 4px;
-            color: var(--light);
-        }
+		.relative-btn {
+			display: inline-block;
+			padding: 5px 10px;
+			background-color: var(--primary);
+			border-radius: 4px;
+			font-size: 0.8rem;
+			transition: all 0.3s;
+		}
 
-        .btn {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-        }
+		.relative-btn:hover {
+			background-color: var(--secondary);
+			color: var(--dark);
+		}
 
-        .btn:hover {
-            background-color: var(--secondary);
-            color: var(--dark);
-        }
+		.controls {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-bottom: 20px;
+		}
 
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--secondary);
-            color: var(--light);
-        }
+		.filter-section {
+			background-color: var(--dark);
+			border-radius: 8px;
+			padding: 20px;
+			margin-bottom: 20px;
+		}
 
-        .btn-outline:hover {
-            background-color: var(--secondary);
-            color: var(--dark);
-        }
+		.filter-section h3 {
+			margin-bottom: 15px;
+			color: var(--accent);
+			border-bottom: 1px solid rgba(255,255,255,0.1);
+			padding-bottom: 10px;
+		}
 
-        .date-range {
-            font-size: 0.8rem;
-            color: #aaa;
-            margin-top: 5px;
-        }
+		.filter-group {
+			margin-bottom: 15px;
+		}
 
-        /* Date indicator */
-        .availability-dates {
-            display: inline-block;
-            padding: 3px 8px;
-            background-color: rgba(0,0,0,0.2);
-            border-radius: 4px;
-            font-size: 0.75rem;
-            margin-top: 5px;
-        }
+		.filter-group label {
+			display: block;
+			margin-bottom: 5px;
+			font-weight: bold;
+		}
 
-        @media (max-width: 992px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .pollen-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
-    </style>
+		.filter-group select, .filter-group input {
+			width: 100%;
+			padding: 8px 10px;
+			background-color: rgba(255,255,255,0.1);
+			border: 1px solid rgba(255,255,255,0.2);
+			border-radius: 4px;
+			color: var(--light);
+		}
+
+		.btn {
+			display: inline-block;
+			background-color: var(--primary);
+			color: white;
+			padding: 8px 15px;
+			border-radius: 5px;
+			font-weight: 500;
+			text-transform: uppercase;
+			font-size: 0.8rem;
+			letter-spacing: 1px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			border: none;
+		}
+
+		.btn:hover {
+			background-color: var(--secondary);
+			color: var(--dark);
+		}
+
+		.btn-outline {
+			background-color: transparent;
+			border: 2px solid var(--secondary);
+			color: var(--light);
+		}
+
+		.btn-outline:hover {
+			background-color: var(--secondary);
+			color: var(--dark);
+		}
+
+		.date-range {
+			font-size: 0.8rem;
+			color: #aaa;
+			margin-top: 5px;
+		}
+
+		/* Date indicator */
+		.availability-dates {
+			display: inline-block;
+			padding: 3px 8px;
+			background-color: rgba(0,0,0,0.2);
+			border-radius: 4px;
+			font-size: 0.75rem;
+			margin-top: 5px;
+		}
+
+		.pollen-notes {
+			font-style: italic;
+			color: #aaa;
+			margin-top: 10px;
+			font-size: 0.85rem;
+		}
+
+		@media (max-width: 992px) {
+			.main-content {
+				grid-template-columns: 1fr;
+			}
+			
+			.pollen-grid {
+				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+			}
+		}
+	</style>
 </head>
 <body>
     <header>
@@ -532,12 +576,36 @@
 				const description = pollen.fallbackData ? pollen.fallbackData.description : "No description available";
 				const genetics = pollen.fallbackData ? pollen.fallbackData.genetics : { female: "Unknown", male: "Unknown" };
 				
+				// Determine if we need to show special breeding method tags
+				let breedingMethodTags = '';
+				if (pollen.breedingMethod) {
+					switch(pollen.breedingMethod.type) {
+						case 'FF':
+							breedingMethodTags += `<span class="pollen-type breeding-ff">FAST FLOWER</span>`;
+							break;
+						case 'S':
+							breedingMethodTags += `<span class="pollen-type breeding-self">SELFED</span>`;
+							break;
+						case 'R':
+							breedingMethodTags += `<span class="pollen-type breeding-reversed">REVERSED</span>`;
+							break;
+						case 'BX':
+							const bxLevel = pollen.breedingMethod.level || 1;
+							const parentStrain = pollen.breedingMethod.parentStrain || "Parent";
+							breedingMethodTags += `<span class="pollen-type breeding-bx">BX${bxLevel} [${parentStrain}]</span>`;
+							break;
+					}
+				}
+				
 				// Create card HTML
 				card.innerHTML = `
 					<div class="pollen-header">
 						<h3>${name}</h3>
-						<span class="pollen-type ${pollen.type.toLowerCase()}">${pollen.type.toUpperCase()}</span>
-						<span class="pollen-type">${pollen.growType.toUpperCase()}</span>
+						<div class="pollen-tags">
+							<span class="pollen-type ${pollen.type.toLowerCase()}">${pollen.type.toUpperCase()}</span>
+							<span class="pollen-type ${pollen.growType.toLowerCase()}">${pollen.growType.toUpperCase()}</span>
+							${breedingMethodTags}
+						</div>
 					</div>
 					<div class="pollen-content">
 						<p class="pollen-description">${description}</p>
@@ -572,7 +640,8 @@
 					});
 				}
 			});
-		}        
+		}
+		
 		function displayPollenCard(pollen) {
 		  // First try to load strain data
 		  if (pollen.strainId) {
