@@ -18,22 +18,43 @@
         "description": "A rebreed of Orange Velvet Underground with enhanced citrus terpenes",
         "parents": {
           "female": {
-            "id": "sour-tangie",
-            "name": "Sour Tangie",
+            "id": "orange-velvet-clone",
+            "name": "Orange Velvet [clone only]",
             "parents": {
               "female": {
-                "id": "east-coast-sour-d",
-                "name": "East Coast Sour D"
+                "id": "herijuana",
+                "name": "Herijuana"
               },
               "male": {
-                "id": "tangie",
-                "name": "Tangie"
+                "id": "orange-skunk",
+                "name": "Orange Skunk"
               }
             }
           },
           "male": {
-            "id": "mandarin-sunset",
-            "name": "Mandarin Sunset"
+            "id": "sour-tangie-sunset",
+            "name": "Sour Tangie Sunset",
+            "description": "Created by combining pollen from Sour Tangie and Mandarin Sunset males",
+            "parents": {
+              "female": {
+                "id": "sour-tangie",
+                "name": "Sour Tangie",
+                "parents": {
+                  "female": {
+                    "id": "east-coast-sour-d",
+                    "name": "East Coast Sour D"
+                  },
+                  "male": {
+                    "id": "tangie",
+                    "name": "Tangie"
+                  }
+                }
+              },
+              "male": {
+                "id": "mandarin-sunset",
+                "name": "Mandarin Sunset"
+              }
+            }
           }
         }
       },
