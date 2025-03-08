@@ -3,83 +3,72 @@
     {
       "id": "la-wedding-pop",
       "strainId": "la-wedding-pop",
+      "name": "L.A. Wedding Pop",
       "type": "feminized",
       "growType": "photoperiod",
-      "breedingMethod": {
-        "type": "S",
-        "notes": "STS-treated and selfed"
-      },
       "harvestDate": "2024-06-15",
       "availableDates": {
         "from": "2024-07-01",
         "to": "2024-12-31"
       },
       "availability": "available",
-      "batchNotes": "Premium collection batch with exceptional viability"
+      "batchNotes": "Premium collection batch with exceptional viability",
+      "genetics": {
+        "female": "Unknown",
+        "male": "Unknown"
+      }
+    },
+    {
+      "id": "grandpas-cookies",
+      "strainId": "grandpas-cake",
+      "name": "Grandpa's Cookies",
+      "type": "feminized",
+      "growType": "photoperiod",
+      "harvestDate": "2024-06-01",
+      "availableDates": {
+        "from": "2024-06-15",
+        "to": "2024-11-30"
+      },
+      "availability": "available",
+      "genetics": {
+        "female": "Unknown",
+        "male": "Unknown"
+      }
     },
     {
       "id": "garlic-lime",
       "strainId": "garlic-lime-og",
+      "name": "Garlic Lime",
       "type": "feminized",
       "growType": "photoperiod",
-      "breedingMethod": {
-        "type": "R",
-        "notes": "STS-treated and reversed onto clone"
-      },
       "harvestDate": "2024-05-10",
       "availableDates": {
         "from": "2024-05-25",
         "to": "2024-10-25"
       },
-      "availability": "available"
-    },
-    {
-      "id": "mybrains-bx",
-      "strainId": null,
-      "type": "regular",
-      "growType": "photoperiod",
-      "breedingMethod": {
-        "type": "BX",
-        "level": 1,
-        "parentStrain": "RCxMB"
-      },
-      "harvestDate": "2024-06-20",
-      "availableDates": {
-        "from": "2024-07-01",
-        "to": "2024-12-31"
-      },
       "availability": "available",
-      "fallbackData": {
-        "name": "MYBRAINS BX1",
-        "genetics": {
-          "female": "MYBRAINS",
-          "male": "RCxMB"
-        },
-        "description": "Backcross of MYBRAINS to its RCxMB parent line."
+      "genetics": {
+        "female": "Unknown",
+        "male": "Unknown"
       }
     },
     {
       "id": "blue-cheese-double-dosi",
       "strainId": null,
+      "name": "Blue Cheese × Double Dosi Bear",
       "type": "regular",
       "growType": "autoflower",
-      "breedingMethod": {
-        "type": "FF"
-      },
       "harvestDate": "2024-04-20",
       "availableDates": {
         "from": "2024-05-01",
         "to": "2024-09-30"
       },
       "availability": "available",
-      "fallbackData": {
-        "name": "Blue Cheese × Double Dosi Bear",
-        "genetics": {
-          "female": "Blue Cheese Auto",
-          "male": "Double Dosi Bear"
-        },
-        "description": "Regular autoflowering pollen. Great for quick-turn breeding projects."
-      }
+      "genetics": {
+        "female": "Blue Cheese Auto",
+        "male": "Double Dosi Bear"
+      },
+      "description": "Regular autoflowering pollen. Great for quick-turn breeding projects."
     }
   ]
 }
