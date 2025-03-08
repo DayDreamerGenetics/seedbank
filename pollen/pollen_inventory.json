@@ -2,8 +2,8 @@
   "pollen": [
     {
       "id": "la-wedding-pop",
-      "strainId": "la-wedding-pop",
       "name": "L.A. Wedding Pop",
+      "strainId": "la-wedding-pop",
       "type": "feminized",
       "growType": "photoperiod",
       "harvestDate": "2024-06-15",
@@ -20,8 +20,8 @@
     },
     {
       "id": "grandpas-cookies",
-      "strainId": "grandpas-cake",
       "name": "Grandpa's Cookies",
+      "strainId": "grandpas-cake",
       "type": "feminized",
       "growType": "photoperiod",
       "harvestDate": "2024-06-01",
@@ -37,8 +37,8 @@
     },
     {
       "id": "garlic-lime",
-      "strainId": "garlic-lime-og",
       "name": "Garlic Lime",
+      "strainId": "garlic-lime-og",
       "type": "feminized",
       "growType": "photoperiod",
       "harvestDate": "2024-05-10",
@@ -54,8 +54,8 @@
     },
     {
       "id": "blue-cheese-double-dosi",
-      "strainId": null,
       "name": "Blue Cheese × Double Dosi Bear",
+      "strainId": null,
       "type": "regular",
       "growType": "autoflower",
       "harvestDate": "2024-04-20",
