@@ -1,0 +1,61 @@
+{
+  "pollen": [
+    {
+      "id": "la-wedding-pop",
+      "strainId": "la-wedding-pop",
+      "type": "feminized",
+      "growType": "photoperiod",
+      "harvestDate": "2024-06-15",
+      "availableDates": {
+        "from": "2024-07-01",
+        "to": "2024-12-31"
+      },
+      "availability": "available",
+      "batchNotes": "Premium collection batch with exceptional viability"
+    },
+    {
+      "id": "grandpas-cookies",
+      "strainId": "grandpas-cake",
+      "type": "feminized",
+      "growType": "photoperiod",
+      "harvestDate": "2024-06-01",
+      "availableDates": {
+        "from": "2024-06-15",
+        "to": "2024-11-30"
+      },
+      "availability": "available"
+    },
+    {
+      "id": "garlic-lime",
+      "strainId": "garlic-lime-og",
+      "type": "feminized",
+      "growType": "photoperiod",
+      "harvestDate": "2024-05-10",
+      "availableDates": {
+        "from": "2024-05-25",
+        "to": "2024-10-25"
+      },
+      "availability": "available"
+    },
+    {
+      "id": "blue-cheese-double-dosi",
+      "strainId": null,
+      "type": "regular",
+      "growType": "autoflower",
+      "harvestDate": "2024-04-20",
+      "availableDates": {
+        "from": "2024-05-01",
+        "to": "2024-09-30"
+      },
+      "availability": "available",
+      "fallbackData": {
+        "name": "Blue Cheese × Double Dosi Bear",
+        "genetics": {
+          "female": "Blue Cheese Auto",
+          "male": "Double Dosi Bear"
+        },
+        "description": "Regular autoflowering pollen. Great for quick-turn breeding projects."
+      }
+    }
+  ]
+}

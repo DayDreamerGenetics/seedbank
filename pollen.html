@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daydreamer Genetics - Pollen Inventory</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3a7d44;      /* Darker green */
+            --secondary: #6fb97a;    /* Lighter green */
+            --accent: #f9c74f;       /* Amber/gold */
+            --dark: #1e2b20;         /* Very dark green, almost black */
+            --light: #f2f7f3;        /* Very light green-tinted white */
+            --background: #1e2b20;   /* Dark background */
+            --text: #f2f7f3;         /* Light text */
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --fem-color: #f9c74f;    /* Color for feminized pollen */
+            --reg-color: #4d7c59;    /* Color for regular pollen */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--light);
+            background-color: var(--background);
+            padding: 20px;
+        }
+
+        a {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            background-color: var(--dark);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            color: var(--light);
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .pollen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .pollen-card {
+            background-color: var(--dark);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .pollen-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pollen-header {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+
+        .pollen-card h3 {
+            margin-bottom: 5px;
+            padding-right: 60px;
+        }
+
+        .pollen-type {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .pollen-type.feminized {
+            background-color: var(--fem-color);
+            color: var(--dark);
+        }
+
+        .pollen-type.regular {
+            background-color: var(--reg-color);
+            color: var(--light);
+        }
+
+        .pollen-content {
+            padding: 15px;
+        }
+
+        .pollen-description {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .pollen-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .pollen-details p {
+            padding: 5px 10px;
+            background-color: rgba(255,255,255,0.05);
+            border-radius: 4px;
+        }
+
+        .pollen-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .availability {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .availability-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .available {
+            background-color: #4aa04a;
+        }
+
+        .limited {
+            background-color: var(--accent);
+        }
+
+        .unavailable {
+            background-color: #e76f51;
+        }
+
+        .relative-btn {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: var(--primary);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .relative-btn:hover {
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            background-color: var(--dark);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filter-section h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+        }
+
+        .filter-group {
+            margin-bottom: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 8px 10px;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            color: var(--light);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--light);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+
+        .date-range {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        /* Date indicator */
+        .availability-dates {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .pollen-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Daydreamer Genetics - Pollen Inventory</h1>
+            <p>Internal catalog of available pollen for breeding projects</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="controls">
+            <button class="btn" id="loadPollenData">Load Pollen Data</button>
+            <button class="btn btn-outline" id="exportCSV">Export to CSV</button>
+        </div>
+        
+        <div class="main-content">
+            <div class="pollen-container">
+                <div class="pollen-grid" id="pollen-grid">
+                    <!-- Pollen cards will be generated here -->
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="filter-section">
+                    <h3>Filter Pollen</h3>
+                    <div class="filter-group">
+                        <label for="type-filter">Type</label>
+                        <select id="type-filter">
+                            <option value="all">All Types</option>
+                            <option value="feminized">Feminized</option>
+                            <option value="regular">Regular</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="availability-filter">Availability</label>
+                        <select id="availability-filter">
+                            <option value="all">All</option>
+                            <option value="available">Available Now</option>
+                            <option value="coming-soon">Coming Soon</option>
+                            <option value="limited">Limited Stock</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="search-filter">Search</label>
+                        <input type="text" id="search-filter" placeholder="Search strain names...">
+                    </div>
+                    <button class="btn" id="apply-filters">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Global variables
+        let pollenData = [];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            loadPollenData();
+        });
+        
+        function setupEventListeners() {
+            // Load pollen data button
+            document.getElementById('loadPollenData').addEventListener('click', function() {
+                loadPollenData();
+            });
+            
+            // Export CSV button
+            document.getElementById('exportCSV').addEventListener('click', function() {
+                exportToCSV();
+            });
+            
+            // Apply filters button
+            document.getElementById('apply-filters').addEventListener('click', function() {
+                applyFilters();
+            });
+            
+            // Search input - filter as you type
+            document.getElementById('search-filter').addEventListener('input', function() {
+                applyFilters();
+            });
+            
+            // Change event on dropdowns
+            document.getElementById('type-filter').addEventListener('change', function() {
+                applyFilters();
+            });
+            
+            document.getElementById('availability-filter').addEventListener('change', function() {
+                applyFilters();
+            });
+        }
+        
+        function loadPollenData() {
+            // Fetch pollen data from JSON file
+            fetch('pollen/pollen_inventory.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch pollen data');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    pollenData = data.pollen || [];
+                    displayPollenCards(pollenData);
+                })
+                .catch(error => {
+                    console.error('Error loading pollen data:', error);
+                    // Load sample data instead
+                    loadSamplePollenData();
+                });
+        }
+        
+        function loadSamplePollenData() {
+            // Sample data for initial display
+            pollenData = [
+                {
+                    id: "la-wedding-pop",
+                    name: "L.A. Wedding Pop",
+                    type: "feminized",
+                    description: "L.A. Wedding Pop is a feminized pollen strain with a superb terpene profile combining sweet cake notes with fruity pop undertones.",
+                    harvestDate: "2024-07-15",
+                    availableDates: {
+                        from: "2024-08-01",
+                        to: "2024-12-31"
+                    },
+                    availability: "coming-soon",
+                    parentStrain: "la-wedding-pop",
+                    genetics: {
+                        female: "LA Kush Cake",
+                        male: "Wedding Crasher"
+                    },
+                    potency: "High",
+                    notes: "Limited collection - premium feminized pollen"
+                },
+                {
+                    id: "grandpas-cookies",
+                    name: "Grandpa's Cookies",
+                    type: "feminized",
+                    description: "Sweet, dessert-like pollen with a complex flavor profile and exceptional breeding potential.",
+                    harvestDate: "2024-06-01",
+                    availableDates: {
+                        from: "2024-06-15",
+                        to: "2024-11-30"
+                    },
+                    availability: "available",
+                    parentStrain: "grandpas-cake",
+                    genetics: {
+                        female: "Wedding Cake",
+                        male: "Grandpa OG"
+                    },
+                    potency: "High",
+                    notes: "Excellent for dessert-oriented breeding projects"
+                },
+                {
+                    id: "garlic-lime",
+                    name: "Garlic Lime",
+                    type: "regular",
+                    description: "Pungent regular pollen with strong garlic notes and a zesty lime finish. Produces high-yield offspring.",
+                    harvestDate: "2024-05-10",
+                    availableDates: {
+                        from: "2024-05-25",
+                        to: "2024-10-25"
+                    },
+                    availability: "limited",
+                    parentStrain: "garlic-lime-og",
+                    genetics: {
+                        female: "GMO",
+                        male: "Lime OG"
+                    },
+                    potency: "Very High",
+                    notes: "Produces vigorous, high-yielding offspring"
+                },
+                {
+                    id: "blue-cheese-double-dosi",
+                    name: "Blue Cheese × Double Dosi Bear",
+                    type: "regular",
+                    description: "Auto-flowering pollen with a unique terpene profile. Produces compact, fast-flowering offspring.",
+                    harvestDate: "2024-04-20",
+                    availableDates: {
+                        from: "2024-05-01",
+                        to: "2024-09-30"
+                    },
+                    availability: "available",
+                    parentStrain: null,
+                    genetics: {
+                        female: "Blue Cheese Auto",
+                        male: "Double Dosi Bear"
+                    },
+                    potency: "Medium-High",
+                    notes: "Auto-flowering genetics, great for quick-turn breeding projects"
+                }
+            ];
+            
+            displayPollenCards(pollenData);
+        }
+        
+		function displayPollenCard(pollen) {
+		  // First try to load strain data
+		  if (pollen.strainId) {
+			fetchStrainData(pollen.strainId)
+			  .then(strainData => {
+				// Create card using combined data
+				createCard({...pollen, ...strainData});
+			  })
+			  .catch(() => {
+				// If strain data doesn't exist, use fallback data
+				createCard({...pollen, ...pollen.fallbackData});
+			  });
+		  } else {
+			// No strain ID, just use the fallback data
+			createCard({...pollen, ...pollen.fallbackData});
+		  }
+		}
+
+		// Function to fetch strain data
+		function fetchStrainData(strainId) {
+		  return fetch(`/strains/${strainId}.json`)
+			.then(response => {
+			  if (!response.ok) throw new Error('Strain not found');
+			  return response.json();
+			});
+		}
+        
+        function applyFilters() {
+            // Get filter values
+            const typeFilter = document.getElementById('type-filter').value;
+            const availabilityFilter = document.getElementById('availability-filter').value;
+            const searchFilter = document.getElementById('search-filter').value.toLowerCase();
+            
+            // Filter the pollen data
+            const filteredPollen = pollenData.filter(pollen => {
+                // Type filter
+                if (typeFilter !== 'all' && pollen.type.toLowerCase() !== typeFilter) {
+                    return false;
+                }
+                
+                // Availability filter
+                if (availabilityFilter !== 'all' && pollen.availability !== availabilityFilter) {
+                    return false;
+                }
+                
+                // Search filter
+                if (searchFilter && !pollen.name.toLowerCase().includes(searchFilter)) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            // Display filtered results
+            displayPollenCards(filteredPollen);
+        }
+        
+        function exportToCSV() {
+            // Create CSV content
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Add headers
+            csvContent += "ID,Name,Type,Description,Harvest Date,Available From,Available To,Availability,Parent Strain,Female Genetics,Male Genetics,Potency,Notes\n";
+            
+            // Add rows
+            pollenData.forEach(pollen => {
+                const row = [
+                    pollen.id,
+                    pollen.name,
+                    pollen.type,
+                    pollen.description.replace(/,/g, ';'),
+                    pollen.harvestDate,
+                    pollen.availableDates?.from || '',
+                    pollen.availableDates?.to || '',
+                    pollen.availability,
+                    pollen.parentStrain || '',
+                    pollen.genetics.female,
+                    pollen.genetics.male,
+                    pollen.potency,
+                    (pollen.notes || '').replace(/,/g, ';')
+                ].join(',');
+                
+                csvContent += row + "\n";
+            });
+            
+            // Create download link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "daydreamer_pollen_inventory.csv");
+            document.body.appendChild(link);
+            
+            // Trigger download
+            link.click();
+            
+            // Clean up
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
