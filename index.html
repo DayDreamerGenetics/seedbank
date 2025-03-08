@@ -595,12 +595,22 @@
 	}
 
 	.footer-col ul li a {
-		color: #ccc;
+		color: #ccc; /* Default color */
+		transition: all 0.3s ease; /* Smooth transition for hover effect */
 	}
 
 	.footer-col ul li a:hover {
-		color: white;
-		padding-left: 5px;
+		color: white; /* Change all text to white on hover */
+		padding-left: 5px; /* Shift text on hover */
+	}
+
+	/* Specific styles for the discount text and code */
+	.footer-col ul li a .code {
+		color: red; /* Red color for the discount code */
+	}
+
+	.footer-col ul li a .discount-code {
+		color: black; /* Black color for 'Save 15% Off' text */
 	}
 
 	.copyright {
@@ -911,10 +921,10 @@
                         <li><a href="https://s.vivosun.com/LNQKQDZ">Vivosun<br>Love What You Grow</a></li>
 						
 						<li>
-							<a href="https://fastbuds.com" target="_blank" style="text-decoration: none; color: #000;">
-								<strong>FastBuds.com</strong> - Use code <span style="color: red;">DDG420</span> for <strong>15% Off!</strong>
+							<a href="https://fastbuds.com" target="_blank" class="discount-link">
+								<strong>FastBuds.com</strong> - Save <span class="discount-code">15% Off</span> with code <span class="code">DDG420</span>
 							</a>
-						</li>					
+						</li>				
 						
                     </ul>
                 </div>				
