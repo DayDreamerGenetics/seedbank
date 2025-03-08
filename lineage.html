@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daydreamer Genetics - Strain Lineage Explorer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3a7d44;      /* Darker green */
+            --secondary: #6fb97a;    /* Lighter green */
+            --accent: #f9c74f;       /* Amber/gold */
+            --dark: #1e2b20;         /* Very dark green, almost black */
+            --light: #f2f7f3;        /* Very light green-tinted white */
+            --background: #1e2b20;   /* Dark background */
+            --text: #f2f7f3;         /* Light text */
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: var(--light);
+            background-color: var(--background);
+            padding: 20px;
+        }
+
+        a {
+            color: var(--secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            background-color: var(--dark);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        h1 {
+            color: var(--light);
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        .lineage-tree {
+            background-color: var(--dark);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .tree-container {
+            width: 100%;
+            height: 800px;
+            overflow: auto;
+            position: relative;
+        }
+
+        .sidebar {
+            background-color: var(--dark);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .strain-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .strain-list li {
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: #2a3c2d;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .strain-list li:hover {
+            background-color: var(--primary);
+        }
+
+        .strain-list li.active {
+            background-color: var(--secondary);
+            color: var(--dark);
+            font-weight: bold;
+        }
+
+        .strain-details {
+            background-color: var(--dark);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .strain-details h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            border-bottom: 1px solid #3a4d3c;
+            padding-bottom: 10px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .details-grid p {
+            padding: 8px 12px;
+            background-color: #2a3c2d;
+            border-radius: 4px;
+        }
+
+        .grow-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .grow-tag {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .tag-flower {
+            background-color: #3a5a40;
+        }
+
+        .tag-stretch-low {
+            background-color: #4aa04a;
+        }
+
+        .tag-stretch-medium {
+            background-color: #f9c74f;
+            color: #1e2b20;
+        }
+
+        .tag-stretch-high {
+            background-color: #e76f51;
+        }
+
+        .tag-regular {
+            background-color: #4d7c59;
+        }
+
+        .tag-feminized {
+            background-color: #f9c74f;
+            color: #1e2b20;
+        }
+
+        .node {
+            cursor: pointer;
+        }
+
+        .node circle {
+            fill: var(--secondary);
+            stroke: var(--primary);
+            stroke-width: 2px;
+        }
+
+        .node text {
+            font: 12px sans-serif;
+            fill: var(--light);
+        }
+
+        .node--internal circle {
+            fill: #555;
+        }
+
+        .link {
+            fill: none;
+            stroke: #ccc;
+            stroke-width: 2px;
+        }
+
+        .tooltip {
+            position: absolute;
+            padding: 10px;
+            background-color: rgba(30,43,32,0.9);
+            border: 1px solid #3a7d44;
+            border-radius: 6px;
+            pointer-events: none;
+            font-size: 0.85rem;
+            max-width: 300px;
+            z-index: 100;
+            display: none;
+        }
+
+        .tooltip h3 {
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .node-type {
+            font-style: italic;
+            color: #aaa;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--light);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+
+        .upload-area {
+            background-color: #2a3c2d;
+            border: 2px dashed #6fb97a;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            background-color: #3a4d3c;
+        }
+
+        .upload-area i {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .tree-container {
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Daydreamer Genetics - Strain Lineage Explorer</h1>
+            <p>Internal tool for exploring the genetic lineage of our strains</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="upload-area" id="uploadArea">
+            <i class="fas fa-file-upload"></i>
+            <p>Drop lineage JSON file here or click to upload</p>
+            <input type="file" id="fileInput" accept=".json">
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="loadDefaultData">Load Sample Data</button>
+            <button class="btn" id="loadFromWebsite">Load From Website JSON</button>
+            <button class="btn btn-outline" id="toggleVertical">Switch Layout</button>
+            <button class="btn btn-outline" id="exportSVG">Export SVG</button>
+        </div>
+        
+        <div class="main-content">
+            <div class="lineage-tree">
+                <div class="tree-container" id="tree-container"></div>
+            </div>
+            
+            <div class="sidebar">
+                <h2>Available Strains</h2>
+                <ul class="strain-list" id="strain-list">
+                    <!-- Strains will be populated here -->
+                </ul>
+            </div>
+        </div>
+        
+        <div class="strain-details" id="strain-details">
+            <h2>Strain Details</h2>
+            <div id="strain-info">
+                <p>Select a strain to view details</p>
+            </div>
+        </div>
+    </main>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Global variables
+        let currentOrientation = 'horizontal';
+        let activeStrainsData = {};
+        let root;
+        let svg;
+        let treeLayout;
+        let i = 0;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            initializeTree();
+        });
+        
+        function setupEventListeners() {
+            // Upload area click
+            document.getElementById('uploadArea').addEventListener('click', function() {
+                document.getElementById('fileInput').click();
+            });
+            
+            // File input change
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            processLineageData(data);
+                        } catch (error) {
+                            alert('Error parsing JSON file: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            });
+            
+            // Load sample data button
+            document.getElementById('loadDefaultData').addEventListener('click', function() {
+                loadSampleData();
+            });
+            
+            // Load from website JSON button
+            document.getElementById('loadFromWebsite').addEventListener('click', function() {
+                fetchWebsiteData();
+            });
+            
+            // Toggle vertical/horizontal layout
+            document.getElementById('toggleVertical').addEventListener('click', function() {
+                currentOrientation = currentOrientation === 'horizontal' ? 'vertical' : 'horizontal';
+                if (root) {
+                    updateTreeLayout();
+                }
+            });
+            
+            // Export SVG button
+            document.getElementById('exportSVG').addEventListener('click', function() {
+                exportSVG();
+            });
+            
+            // Drag and drop
+            const uploadArea = document.getElementById('uploadArea');
+            
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.backgroundColor = '#3a4d3c';
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.backgroundColor = '#2a3c2d';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.style.backgroundColor = '#2a3c2d';
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'application/json') {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            processLineageData(data);
+                        } catch (error) {
+                            alert('Error parsing JSON file: ' + error.message);
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    alert('Please upload a valid JSON file');
+                }
+            });
+        }
+        
+        function initializeTree() {
+            // Create SVG
+            const width = document.getElementById('tree-container').clientWidth;
+            const height = document.getElementById('tree-container').clientHeight;
+            
+            svg = d3.select('#tree-container')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', 'translate(40,0)');
+            
+            // Create tooltip
+            const tooltip = d3.select('#tooltip');
+            
+            // Initialize with sample data
+            loadSampleData();
+        }
+        
+        function updateTreeLayout() {
+            const width = document.getElementById('tree-container').clientWidth;
+            const height = document.getElementById('tree-container').clientHeight;
+            
+            // Clear previous tree
+            svg.selectAll('*').remove();
+            
+            // Create appropriate tree layout based on orientation
+            if (currentOrientation === 'horizontal') {
+                treeLayout = d3.tree().size([height - 100, width - 160]);
+                
+                // Define a diagonal generator for links
+                const diagonal = d3.linkHorizontal()
+                    .x(d => d.y)
+                    .y(d => d.x);
+                
+                // Compute the tree layout
+                treeLayout(root);
+                
+                // Add links
+                svg.selectAll('path.link')
+                    .data(root.links())
+                    .enter().append('path')
+                    .attr('class', 'link')
+                    .attr('d', diagonal);
+                
+                // Add nodes
+                const nodes = svg.selectAll('g.node')
+                    .data(root.descendants())
+                    .enter().append('g')
+                    .attr('class', d => 'node ' + (d.children ? 'node--internal' : 'node--leaf'))
+                    .attr('transform', d => `translate(${d.y},${d.x})`)
+                    .on('click', handleNodeClick)
+                    .on('mouseover', showNodeTooltip)
+                    .on('mouseout', hideNodeTooltip);
+                
+                // Add circles to nodes
+                nodes.append('circle')
+                    .attr('r', 8)
+                    .style('fill', d => getNodeColor(d));
+                
+                // Add labels to nodes
+                nodes.append('text')
+                    .attr('dy', '.31em')
+                    .attr('x', d => d.children ? -12 : 12)
+                    .style('text-anchor', d => d.children ? 'end' : 'start')
+                    .text(d => d.data.name);
+                
+            } else {
+                // Vertical layout
+                treeLayout = d3.tree().size([width - 100, height - 160]);
+                
+                // Define a diagonal generator for links
+                const diagonal = d3.linkVertical()
+                    .x(d => d.x)
+                    .y(d => d.y);
+                
+                // Compute the tree layout
+                treeLayout(root);
+                
+                // Add links
+                svg.selectAll('path.link')
+                    .data(root.links())
+                    .enter().append('path')
+                    .attr('class', 'link')
+                    .attr('d', diagonal);
+                
+                // Add nodes
+                const nodes = svg.selectAll('g.node')
+                    .data(root.descendants())
+                    .enter().append('g')
+                    .attr('class', d => 'node ' + (d.children ? 'node--internal' : 'node--leaf'))
+                    .attr('transform', d => `translate(${d.x},${d.y})`)
+                    .on('click', handleNodeClick)
+                    .on('mouseover', showNodeTooltip)
+                    .on('mouseout', hideNodeTooltip);
+                
+                // Add circles to nodes
+                nodes.append('circle')
+                    .attr('r', 8)
+                    .style('fill', d => getNodeColor(d));
+                
+                // Add labels to nodes
+                nodes.append('text')
+                    .attr('dy', '-.5em')
+                    .attr('x', 0)
+                    .style('text-anchor', 'middle')
+                    .text(d => d.data.name)
+                    .call(wrap, 120);
+            }
+        }
+        
+        function getNodeColor(d) {
+            // Color coding based on node type
+            if (d.data.nodeType === 'strain') {
+                return '#3a7d44'; // Main strain
+            } else if (d.data.nodeType === 'female') {
+                return '#e76f51'; // Female/mother
+            } else if (d.data.nodeType === 'male') {
+                return '#4895ef'; // Male/father
+            } else {
+                return '#6fb97a'; // Default
+            }
+        }
+        
+        function handleNodeClick(event, d) {
+            // Display strain information
+            displayStrainDetails(d.data);
+            
+            // Highlight this node in the tree
+            d3.selectAll('circle').style('stroke-width', 2);
+            d3.select(event.currentTarget).select('circle').style('stroke-width', 4).style('stroke', '#f9c74f');
+        }
+        
+        function showNodeTooltip(event, d) {
+            const tooltip = d3.select('#tooltip');
+            
+            let content = `<h3>${d.data.name}</h3>`;
+            if (d.data.nodeType) {
+                content += `<p class="node-type">${capitalizeFirstLetter(d.data.nodeType)}</p>`;
+            }
+            if (d.data.description) {
+                content += `<p>${d.data.description}</p>`;
+            }
+            
+            tooltip.html(content)
+                .style('display', 'block')
+                .style('left', (event.pageX + 15) + 'px')
+                .style('top', (event.pageY - 28) + 'px');
+        }
+        
+        function hideNodeTooltip() {
+            d3.select('#tooltip').style('display', 'none');
+        }
+        
+        function displayStrainDetails(strainData) {
+            const strainInfo = document.getElementById('strain-info');
+            const nodeTitle = strainData.name || 'Unknown Strain';
+            const nodeType = strainData.nodeType ? capitalizeFirstLetter(strainData.nodeType) : '';
+            
+            // Build HTML content based on available data
+            let html = `<h3>${nodeTitle}</h3>`;
+            
+            if (nodeType) {
+                html += `<p class="node-type">${nodeType}</p>`;
+            }
+            
+            if (strainData.description) {
+                html += `<p>${strainData.description}</p>`;
+            }
+            
+            // Add growing information if available
+            if (strainData.flowerTime || strainData.stretch || strainData.seedType || strainData.feminized !== undefined) {
+                html += `<div class="grow-info">`;
+                
+                if (strainData.flowerTime) {
+                    html += `<span class="grow-tag tag-flower">🌸 ${strainData.flowerTime}</span>`;
+                }
+                
+                if (strainData.stretch) {
+                    html += `<span class="grow-tag tag-stretch-${strainData.stretch.toLowerCase()}">📏 ${capitalizeFirstLetter(strainData.stretch)} Stretch</span>`;
+                }
+                
+                if (strainData.seedType) {
+                    const seedClass = strainData.seedType.toLowerCase() === 'feminized' ? 'tag-feminized' : 'tag-regular';
+                    html += `<span class="grow-tag ${seedClass}">🌱 ${strainData.seedType.toUpperCase()}</span>`;
+                } else if (strainData.feminized !== undefined) {
+                    const seedText = strainData.feminized ? 'FEMINIZED' : 'REGULAR';
+                    const seedClass = strainData.feminized ? 'tag-feminized' : 'tag-regular';
+                    html += `<span class="grow-tag ${seedClass}">🌱 ${seedText}</span>`;
+                }
+                
+                html += `</div>`;
+            }
+            
+            // Add additional details if available
+            html += `<div class="details-grid">`;
+            
+            if (strainData.type) {
+                html += `<p><strong>Type:</strong> ${capitalizeFirstLetter(strainData.type)}</p>`;
+            }
+            
+            if (strainData.dominance) {
+                html += `<p><strong>Dominance:</strong> ${capitalizeFirstLetter(strainData.dominance)}</p>`;
+            }
+            
+            if (strainData.breedingType) {
+                html += `<p><strong>Breeding Type:</strong> ${strainData.breedingType}</p>`;
+            }
+            
+            if (strainData.generation) {
+                html += `<p><strong>Generation:</strong> ${strainData.generation}</p>`;
+            }
+            
+            if (strainData.seedCount) {
+                html += `<p><strong>Seeds Per Pack:</strong> ${strainData.seedCount}</p>`;
+            }
+            
+            if (strainData.availabilityStatus) {
+                html += `<p><strong>Status:</strong> ${capitalizeFirstLetter(strainData.availabilityStatus.replace(/-/g, ' '))}</p>`;
+            }
+            
+            html += `</div>`;
+            
+            strainInfo.innerHTML = html;
+        }
+        
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        function processLineageData(data) {
+            // Store the active strain data
+            activeStrainsData = data;
+            
+            // Transform the data into a hierarchy
+            let hierarchyData;
+            
+            if (data.strain) {
+                // Single strain detailed lineage format
+                hierarchyData = transformStrainLineage(data.strain);
+            } else if (data.strains) {
+                // Multiple strains basic format
+                hierarchyData = {
+                    name: "Strain Catalog",
+                    nodeType: "catalog",
+                    children: data.strains.map(strain => ({
+                        name: strain.name,
+                        nodeType: "strain",
+                        ...strain
+                    }))
+                };
+            } else {
+                alert('Unrecognized data format. Please check your JSON structure.');
+                return;
+            }
+            
+            // Update strain list
+            updateStrainList(data);
+            
+            // Create the tree from the hierarchy
+            root = d3.hierarchy(hierarchyData);
+            
+            // Update the visualization
+            updateTreeLayout();
+        }
+        
+        function transformStrainLineage(strain) {
+            // Create a hierarchical structure for the strain and its lineage
+            const result = {
+                name: strain.name,
+                nodeType: "strain",
+                ...strain
+            };
+            
+            // If lineage information exists, add it as children
+            if (strain.lineage) {
+                result.children = [];
+                
+                if (strain.lineage.female) {
+                    const female = {
+                        name: strain.lineage.female.name,
+                        nodeType: "female",
+                        ...strain.lineage.female
+                    };
+                    
+                    // Add female parent lineage recursively
+                    if (strain.lineage.female.parents) {
+                        female.children = [];
+                        
+                        if (strain.lineage.female.parents.female) {
+                            female.children.push({
+                                name: strain.lineage.female.parents.female.name,
+                                nodeType: "female",
+                                ...strain.lineage.female.parents.female,
+                                children: getGrandparentNodes(strain.lineage.female.parents.female)
+                            });
+                        }
+                        
+                        if (strain.lineage.female.parents.male) {
+                            female.children.push({
+                                name: strain.lineage.female.parents.male.name,
+                                nodeType: "male",
+                                ...strain.lineage.female.parents.male,
+                                children: getGrandparentNodes(strain.lineage.female.parents.male)
+                            });
+                        }
+                    }
+                    
+                    result.children.push(female);
+                }
+                
+                if (strain.lineage.male) {
+                    const male = {
+                        name: strain.lineage.male.name,
+                        nodeType: "male",
+                        ...strain.lineage.male
+                    };
+                    
+                    // Add male parent lineage recursively
+                    if (strain.lineage.male.parents) {
+                        male.children = [];
+                        
+                        if (strain.lineage.male.parents.female) {
+                            male.children.push({
+                                name: strain.lineage.male.parents.female.name,
+                                nodeType: "female",
+                                ...strain.lineage.male.parents.female,
+                                children: getGrandparentNodes(strain.lineage.male.parents.female)
+                            });
+                        }
+                        
+                        if (strain.lineage.male.parents.male) {
+                            male.children.push({
+                                name: strain.lineage.male.parents.male.name,
+                                nodeType: "male",
+                                ...strain.lineage.male.parents.male,
+                                children: getGrandparentNodes(strain.lineage.male.parents.male)
+                            });
+                        }
+                    }
+                    
+                    result.children.push(male);
+                }
+            }
+            
+            return result;
+        }
+        
+        function getGrandparentNodes(parent) {
+            if (!parent.parents) return null;
+            
+            const children = [];
+            
+            if (parent.parents.female) {
+                children.push({
+                    name: parent.parents.female.name,
+                    nodeType: "female",
+                    ...parent.parents.female,
+                    children: parent.parents.female.parents ? getGrandparentNodes(parent.parents.female) : null
+                });
+            }
+            
+            if (parent.parents.male) {
+                children.push({
+                    name: parent.parents.male.name,
+                    nodeType: "male",
+                    ...parent.parents.male,
+                    children: parent.parents.male.parents ? getGrandparentNodes(parent.parents.male) : null
+                });
+            }
+            
+            return children.length > 0 ? children : null;
+        }
+        
+        function updateStrainList(data) {
+            const strainList = document.getElementById('strain-list');
+            strainList.innerHTML = '';
+            
+            // Create strain list based on data structure
+            if (data.strain) {
+                // Single strain detailed format
+                const li = document.createElement('li');
+                li.textContent = data.strain.name;
+                li.classList.add('active');
+                li.addEventListener('click', function() {
+                    processLineageData(data);
+                });
+                strainList.appendChild(li);
+            } else if (data.strains) {
+                // Multiple strains format
+                data.strains.forEach(strain => {
+                    const li = document.createElement('li');
+                    li.textContent = strain.name;
+                    li.addEventListener('click', function() {
+                        // Highlight selected strain
+                        document.querySelectorAll('.strain-list li').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        li.classList.add('active');
+                        
+                        // Load strain data if available, or show basic structure
+                        fetchStrainLineage(strain.id, strain.name);
+                    });
+                    strainList.appendChild(li);
+                });
+            }
+        }
+        
+        function fetchStrainLineage(strainId, strainName) {
+            // First check if we have detailed lineage data
+            fetch(`lineage/${strainId}.json`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Lineage data not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    processLineageData(data);
+                })
+                .catch(error => {
+                    console.log('No detailed lineage found, using basic data');
+                    
+                    // Create a basic strain node using available data
+                    const strain = activeStrainsData.strains.find(s => s.id === strainId);
+                    
+                    if (strain) {
+                        const basicLineage = createBasicLineage(strain);
+                        processLineageData({ strain: basicLineage });
+                    } else {
+                        alert(`Could not find data for strain: ${strainName}`);
+                    }
+                });
+        }
+        
+        function createBasicLineage(strain) {
+            // Create a basic lineage structure from strain data
+            const lineage = {
+                ...strain,
+                lineage: {}
+            };
+            
+            // If parentage is defined, use it to create lineage
+            if (strain.parentage) {
+                lineage.lineage = {
+                    female: {
+                        id: strain.parentage.female.id,
+                        name: strain.parentage.female.name,
+                        nodeType: "female"
+                    },
+                    male: {
+                        id: strain.parentage.male.id,
+                        name: strain.parentage.male.name,
+                        nodeType: "male"
+                    }
+                };
+            }
+            
+            return lineage;
+        }
+        
+        function loadSampleData() {
+            // Load sample data for Tangerine Truffle
+            const sampleData = {
+                "strain": {
+                    "id": "tangerine-truffle",
+                    "name": "Tangerine Truffle",
+                    "breedingType": "F1",
+                    "type": "photoperiod",
+                    "dominance": "sativa-dominant",
+                    "flowerTime": "8-9 weeks",
+                    "stretch": "medium",
+                    "seedType": "regular",
+                    "description": "Tangerine Truffle combines citrus notes with deep chocolate undertones. This sativa-dominant hybrid provides an uplifting, creative high perfect for daytime use.",
+                    "availabilityStatus": "in-stock",
+                    "lineage": {
+                        "female": {
+                            "id": "orange-velvet-underground-rbx",
+                            "name": "Orange Velvet Underground RBX",
+                            "description": "A rebreed of Orange Velvet Underground with enhanced citrus terpenes",
+                            "parents": {
+                                "female": {
+                                    "id": "sour-tangie-x-mandarin-sunset",
+                                    "name": "Sour Tangie × Mandarin Sunset",
+                                    "parents": {
+                                        "female": {
+                                            "id": "east-coast-sour-d",
+                                            "name": "East Coast Sour D"
+                                        },
+                                        "male": {
+                                            "id": "tangie",
+                                            "name": "Tangie"
+                                        }
+                                    }
+                                },
+                                "male": {
+                                    "id": "orange-velvet-clone",
+                                    "name": "Orange Velvet [clone only]",
+                                    "parents": {
+                                        "female": {
+                                            "id": "herijuana",
+                                            "name": "Herijuana"
+                                        },
+                                        "male": {
+                                            "id": "orange-skunk",
+                                            "name": "Orange Skunk"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "male": {
+                            "id": "unipoop-pie",
+                            "name": "Unipoop Pie",
+                            "description": "A unique cross combining the potency of Unicorn Poop with the flavor profile of Chocolate Pie",
+                            "parents": {
+                                "female": {
+                                    "id": "unicorn-poop",
+                                    "name": "Unicorn Poop",
+                                    "parents": {
+                                        "female": {
+                                            "id": "gmo",
+                                            "name": "GMO"
+                                        },
+                                        "male": {
+                                            "id": "sophisticated-lady",
+                                            "name": "Sophisticated Lady"
+                                        }
+                                    }
+                                },
+                                "male": {
+                                    "id": "chocolate-pie",
+                                    "name": "Chocolate Pie",
+                                    "parents": {
+                                        "female": {
+                                            "id": "unknown-female",
+                                            "name": "Unknown"
+                                        },
+                                        "male": {
+                                            "id": "unknown-male",
+                                            "name": "Unknown"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            processLineageData(sampleData);
+        }
+        
+        function fetchWebsiteData() {
+            // Fetch the strain data from the website's JSON file
+            fetch('daydreamer_strains.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch website data');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    processLineageData(data);
+                })
+                .catch(error => {
+                    console.error('Error loading website data:', error);
+                    alert('Could not load data from website. Using sample data instead.');
+                    loadSampleData();
+                });
+        }
+        
+        function exportSVG() {
+            // Get SVG element
+            const svgEl = document.querySelector('#tree-container svg');
+            
+            if (!svgEl) {
+                alert('No SVG to export');
+                return;
+            }
+            
+            // Create a serialized SVG string
+            const serializer = new XMLSerializer();
+            let svgString = serializer.serializeToString(svgEl);
+            
+            // Add namespaces
+            if (!svgString.match(/^<svg[^>]+xmlns="http:\/\/www\.w3\.org\/2000\/svg"/)) {
+                svgString = svgString.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            
+            // Add CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                .node circle {
+                    fill: #6fb97a;
+                    stroke: #3a7d44;
+                    stroke-width: 2px;
+                }
+                .node--internal circle {
+                    fill: #555;
+                }
+                .node text {
+                    font: 12px sans-serif;
+                    fill: #f2f7f3;
+                }
+                .link {
+                    fill: none;
+                    stroke: #ccc;
+                    stroke-width: 2px;
+                }
+                svg {
+                    background-color: #1e2b20;
+                }
+            `;
+            
+            // Convert to a data URL
+            const svgBlob = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+            const svgUrl = URL.createObjectURL(svgBlob);
+            
+            // Create a download link and trigger a click
+            const downloadLink = document.createElement("a");
+            downloadLink.href = svgUrl;
+            downloadLink.download = "daydreamer_lineage.svg";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+        
+        // Text wrapping function for node labels
+        function wrap(text, width) {
+            text.each(function() {
+                const text = d3.select(this);
+                const words = text.text().split(/\s+/).reverse();
+                let word;
+                let line = [];
+                let lineNumber = 0;
+                const lineHeight = 1.1; // ems
+                const y = text.attr("y");
+                const dy = parseFloat(text.attr("dy"));
+                let tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+                
+                while (word = words.pop()) {
+                    line.push(word);
+                    tspan.text(line.join(" "));
+                    if (tspan.node().getComputedTextLength() > width) {
+                        line.pop();
+                        tspan.text(line.join(" "));
+                        line = [word];
+                        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                    }
+                }
+            });
+        }
+
+</script>
+</body>
+</html>		
