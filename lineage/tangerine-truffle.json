@@ -1,0 +1,87 @@
+{
+  "strain": {
+    "id": "tangerine-truffle",
+    "name": "Tangerine Truffle",
+    "breedingType": "F1",
+    "type": "photoperiod",
+    "dominance": "sativa-dominant",
+    "flowerTime": "8-9 weeks",
+    "stretch": "medium",
+    "seedType": "regular",
+    "feminized": false,
+    "description": "Tangerine Truffle combines citrus notes with deep chocolate undertones. This sativa-dominant hybrid provides an uplifting, creative high perfect for daytime use.",
+    "availabilityStatus": "in-stock",
+    "lineage": {
+      "female": {
+        "id": "orange-velvet-underground-rbx",
+        "name": "Orange Velvet Underground RBX",
+        "description": "A rebreed of Orange Velvet Underground with enhanced citrus terpenes",
+        "parents": {
+          "female": {
+            "id": "sour-tangie-x-mandarin-sunset",
+            "name": "Sour Tangie × Mandarin Sunset",
+            "parents": {
+              "female": {
+                "id": "east-coast-sour-d",
+                "name": "East Coast Sour D"
+              },
+              "male": {
+                "id": "tangie",
+                "name": "Tangie"
+              }
+            }
+          },
+          "male": {
+            "id": "orange-velvet-clone",
+            "name": "Orange Velvet [clone only]",
+            "parents": {
+              "female": {
+                "id": "herijuana",
+                "name": "Herijuana"
+              },
+              "male": {
+                "id": "orange-skunk",
+                "name": "Orange Skunk"
+              }
+            }
+          }
+        }
+      },
+      "male": {
+        "id": "unipoop-pie",
+        "name": "Unipoop Pie",
+        "description": "A unique cross combining the potency of Unicorn Poop with the flavor profile of Chocolate Pie",
+        "parents": {
+          "female": {
+            "id": "unicorn-poop",
+            "name": "Unicorn Poop",
+            "parents": {
+              "female": {
+                "id": "gmo",
+                "name": "GMO"
+              },
+              "male": {
+                "id": "sophisticated-lady",
+                "name": "Sophisticated Lady"
+              }
+            }
+          },
+          "male": {
+            "id": "chocolate-pie",
+            "name": "Chocolate Pie",
+            "parents": {
+              "female": {
+                "id": "unknown-female",
+                "name": "Unknown"
+              },
+              "male": {
+                "id": "unknown-male",
+                "name": "Unknown"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
