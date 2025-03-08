@@ -571,10 +571,10 @@
 					dateRangeText = `${fromDate.toLocaleDateString()} - ${toDate.toLocaleDateString()}`;
 				}
 				
-				// Get name and other details from either the strain or fallback data
-				const name = pollen.fallbackData ? pollen.fallbackData.name : pollen.id;
-				const description = pollen.fallbackData ? pollen.fallbackData.description : "No description available";
-				const genetics = pollen.fallbackData ? pollen.fallbackData.genetics : { female: "Unknown", male: "Unknown" };
+				// Use name explicitly
+				const name = pollen.name;
+				const description = pollen.description || "No description available";
+				const genetics = pollen.genetics || { female: "Unknown", male: "Unknown" };
 				
 				// Determine if we need to show special breeding method tags
 				let breedingMethodTags = '';
@@ -610,7 +610,7 @@
 					<div class="pollen-content">
 						<p class="pollen-description">${description}</p>
 						<div class="pollen-details">
-							${genetics ? `<p><strong>Genetics:</strong> ${genetics.female} × ${genetics.male}</p>` : ''}
+							<p><strong>Genetics:</strong> ${genetics.female} × ${genetics.male}</p>
 							<p><strong>Harvest:</strong> ${new Date(pollen.harvestDate).toLocaleDateString()}</p>
 							<p><strong>Status:</strong> ${availabilityText}</p>
 						</div>
