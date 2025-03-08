@@ -25,7 +25,10 @@
         "gallery": []
       },
       "description": "A powerful indica-dominant hybrid with monstrous effects. Frankenstrain combines unknown genetics to create a beast of a strain with deep relaxation properties.",
-      "availabilityStatus": "in-stock"
+      "availabilityStatus": "in-stock",
+      "flowerTime": "7-8 weeks",
+      "stretch": "low",
+      "seedType": "regular"
     },
     {
       "id": "garys-canna-cherries",
@@ -52,7 +55,10 @@
         "gallery": []
       },
       "description": "A delicious cross of Gary's Canna with distinct cherry flavors. This strain produces buds with a sweet, fruity aroma and a pleasant balanced high.",
-      "availabilityStatus": "in-stock"
+      "availabilityStatus": "in-stock",
+      "flowerTime": "8-9 weeks",
+      "stretch": "medium-high",
+      "seedType": "feminized"
     },
     {
       "id": "tangerine-truffle",
@@ -69,7 +75,7 @@
         }
       },
       "type": "photoperiod",
-      "dominance": "sativa-dominant",
+      "dominance": "indica-dominant",
       "generation": "F1",
       "feminized": true,
       "seedCount": 40,
@@ -79,7 +85,10 @@
         "gallery": []
       },
       "description": "Tangerine Truffle combines citrus notes with deep chocolate undertones. This sativa-dominant hybrid provides an uplifting, creative high perfect for daytime use.",
-      "availabilityStatus": "in-stock"
+      "availabilityStatus": "in-stock",
+      "flowerTime": "8-9 weeks",
+      "stretch": "medium",
+      "seedType": "regular"
     },
     {
       "id": "grandpas-cake",
@@ -106,7 +115,10 @@
         "gallery": []
       },
       "description": "Grandpa's Cake offers sweet, cake-like flavors with a powerful indica punch. This strain is ideal for evening use, providing deep body relaxation and peaceful sleep.",
-      "availabilityStatus": "in-stock"
+      "availabilityStatus": "in-stock",
+      "flowerTime": "7-8 weeks",
+      "stretch": "low",
+      "seedType": "regular"
     }
   ],
   "collections": [
