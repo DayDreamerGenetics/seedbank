@@ -713,9 +713,9 @@
 				nodes.append('rect')
 					.attr('rx', 15)
 					.attr('ry', 15)
-					.attr('x', d => -50)
+					.attr('x', d => -d.data.name.length * 4 - 15)  // Dynamic width based on text
 					.attr('y', d => -15)
-					.attr('width', d => 100)
+					.attr('width', d => d.data.name.length * 8 + 30)  // Width based on text length
 					.attr('height', 30)
 					.style('fill', d => getNodeColor(d.data.nodeType));
 				
@@ -736,10 +736,10 @@
 
 		// Get color based on node type
 		function getNodeColor(nodeType) {
-			if (nodeType === 'strain') return '#3a7d44';
-			if (nodeType === 'female') return '#e76f51';
-			if (nodeType === 'male') return '#4895ef';
-			return '#6fb97a';
+			if (nodeType === 'strain') return '#3a7d44';  // Green for main strain
+			if (nodeType === 'female') return '#e76f51';  // Orange-red for female
+			if (nodeType === 'male') return '#4895ef';    // Blue for male
+			return '#6fb97a';  // Default green
 		}
         
         function handleNodeClick(event, d) {
