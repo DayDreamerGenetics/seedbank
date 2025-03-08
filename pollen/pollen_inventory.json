@@ -5,6 +5,10 @@
       "strainId": "la-wedding-pop",
       "type": "feminized",
       "growType": "photoperiod",
+      "breedingMethod": {
+        "type": "S",
+        "notes": "STS-treated and selfed"
+      },
       "harvestDate": "2024-06-15",
       "availableDates": {
         "from": "2024-07-01",
@@ -14,22 +18,14 @@
       "batchNotes": "Premium collection batch with exceptional viability"
     },
     {
-      "id": "grandpas-cookies",
-      "strainId": "grandpas-cake",
-      "type": "feminized",
-      "growType": "photoperiod",
-      "harvestDate": "2024-06-01",
-      "availableDates": {
-        "from": "2024-06-15",
-        "to": "2024-11-30"
-      },
-      "availability": "available"
-    },
-    {
       "id": "garlic-lime",
       "strainId": "garlic-lime-og",
       "type": "feminized",
       "growType": "photoperiod",
+      "breedingMethod": {
+        "type": "R",
+        "notes": "STS-treated and reversed onto clone"
+      },
       "harvestDate": "2024-05-10",
       "availableDates": {
         "from": "2024-05-25",
@@ -38,10 +34,38 @@
       "availability": "available"
     },
     {
+      "id": "mybrains-bx",
+      "strainId": null,
+      "type": "regular",
+      "growType": "photoperiod",
+      "breedingMethod": {
+        "type": "BX",
+        "level": 1,
+        "parentStrain": "RCxMB"
+      },
+      "harvestDate": "2024-06-20",
+      "availableDates": {
+        "from": "2024-07-01",
+        "to": "2024-12-31"
+      },
+      "availability": "available",
+      "fallbackData": {
+        "name": "MYBRAINS BX1",
+        "genetics": {
+          "female": "MYBRAINS",
+          "male": "RCxMB"
+        },
+        "description": "Backcross of MYBRAINS to its RCxMB parent line."
+      }
+    },
+    {
       "id": "blue-cheese-double-dosi",
       "strainId": null,
       "type": "regular",
       "growType": "autoflower",
+      "breedingMethod": {
+        "type": "FF"
+      },
       "harvestDate": "2024-04-20",
       "availableDates": {
         "from": "2024-05-01",
