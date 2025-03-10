@@ -88,6 +88,9 @@
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			gap: 0.75rem;
+			position: relative; /* Add this */
+			left: 0 !important; /* Add this */
+			transform: none !important; /* Add this */
 		}
 
 		.chat-container {
@@ -113,6 +116,9 @@
 			min-height: 800px;
 		}
 
+		.chat-container, .image-container {
+			width: 100%; /* Add this */
+		}
 
 		.chat-header, .image-header {
 			background-color: var(--primary-color);
