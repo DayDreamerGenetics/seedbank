@@ -90,16 +90,29 @@
 			gap: 0.75rem;
 		}
 
-		.chat-container, .image-container {
+		.chat-container {
 			background-color: white;
 			border-radius: 10px;
 			box-shadow: var(--shadow);
-			overflow: visible; /* Changed from hidden to visible */
+			overflow: hidden;
 			display: flex;
 			flex-direction: column;
-			height: auto !important; /* Auto height */
+			height: 800px !important;
+			max-height: 800px !important;
+			min-height: 800px !important;
+		}
+
+		.image-container {
+			background-color: white;
+			border-radius: 10px;
+			box-shadow: var(--shadow);
+			overflow: visible;
+			display: flex;
+			flex-direction: column;
+			height: auto !important;
 			min-height: 800px;
 		}
+
 
 		.chat-header, .image-header {
 			background-color: var(--primary-color);
@@ -123,6 +136,8 @@
 		.chat-messages {
 			flex: 1;
 			padding: 0.75rem;
+			height: 600px;
+			max-height: 600px;
 			overflow-y: auto;
 		}
 
