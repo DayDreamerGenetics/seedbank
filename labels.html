@@ -39,7 +39,7 @@
 			align-items: center;
 			margin-top: 0 !important;
 		}
-		
+
 		body {
 			background-color: #F9FFF9;
 			color: var(--text-color);
@@ -69,10 +69,6 @@
 			line-height: 1.2;
 		}
 
-		.bottom-margin {
-			margin-bottom: 60px; /* Increased from 40px */
-		}
-
 		.logo {
 			font-size: 1.8rem;
 			font-weight: bold;
@@ -87,7 +83,7 @@
 
 		.container {
 			max-width: 1200px;
-			margin: 100px auto 0 auto; /* 100px top margin to account for nav bar height */
+			margin: 100px auto 100px auto; /* Top and bottom margin */
 			padding: 0 1rem;
 			display: grid;
 			grid-template-columns: 1fr 1fr;
@@ -98,10 +94,11 @@
 			background-color: white;
 			border-radius: 10px;
 			box-shadow: var(--shadow);
-			overflow: hidden;
+			overflow: visible; /* Changed from hidden to visible */
 			display: flex;
 			flex-direction: column;
-			height: 800px;
+			height: auto !important; /* Auto height */
+			min-height: 800px;
 		}
 
 		.chat-header, .image-header {
@@ -227,10 +224,10 @@
 			justify-content: space-between;
 		}
 
+		/* Fixed height for image area */
 		.image-display {
 			flex: 0 0 auto;
 			height: 450px;
-			min-height: auto;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -268,17 +265,44 @@
 			100% { transform: translate(-50%, -50%) rotate(360deg); }
 		}
 
+		/* Fixed height for thumbnail gallery */
+		.thumbnail-gallery {
+			flex: 0 0 auto;
+			height: 80px;
+			display: flex;
+			overflow-x: auto;
+			padding: 0.5rem;
+			gap: 0.5rem;
+			background-color: rgba(0,0,0,0.03);
+			margin-top: 0.5rem;
+		}
+
+		.thumbnail {
+			width: 60px;
+			height: 60px;
+			border-radius: 4px;
+			object-fit: cover;
+			cursor: pointer;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+			transition: transform 0.2s ease;
+		}
+
+		.thumbnail:hover {
+			transform: scale(1.05);
+		}
+
+		/* Ensure image controls are always visible with no scroll */
 		.image-controls {
-			flex: 1 1 auto;
+			height: auto !important;
 			padding: 1rem;
 			background-color: #f9f9f9;
 			border-top: 1px solid #eee;
-			overflow-y: auto;
-			max-height: 230px;
+			overflow: visible !important;
+			min-height: 300px;
 		}
 
 		.options-group {
-			margin-bottom: 1rem;
+			margin-bottom: 1.5rem;
 		}
 
 		.options-group label {
@@ -303,12 +327,6 @@
 			position: relative;
 		}
 
-		.style-selector-container {
-			max-height: 200px;
-			overflow-y: auto;
-			margin-bottom: 1rem;
-		}
-
 		.style-selector select {
 			width: 100%;
 			padding: 0.6rem;
@@ -329,14 +347,15 @@
 			box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 		}
 
+		/* Style tags area with no overflow limit */
 		.style-tags {
 			display: flex;
 			flex-wrap: wrap;
 			gap: 0.4rem;
 			margin-top: 0.4rem;
-			margin-bottom: 1rem;
-			max-height: 100px;
-			overflow-y: auto;
+			margin-bottom: 1.5rem;
+			min-height: 40px;
+			overflow: visible !important;
 		}
 
 		.style-tag {
@@ -494,7 +513,7 @@
 		}
 
 		.bottom-margin {
-			margin-bottom: 40px;
+			margin-bottom: 80px;
 		}
 
 		/* QR CODE STYLES */
@@ -570,31 +589,6 @@
 
 		.qr-button:hover {
 			background-color: var(--dark-color);
-		}
-
-		.thumbnail-gallery {
-			flex: 0 0 auto;
-			height: 80px;
-			display: flex;
-			overflow-x: auto;
-			padding: 0.5rem;
-			gap: 0.5rem;
-			background-color: rgba(0,0,0,0.03);
-			margin-top: 0.5rem;
-		}
-
-		.thumbnail {
-			width: 60px;
-			height: 60px;
-			border-radius: 4px;
-			object-fit: cover;
-			cursor: pointer;
-			box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-			transition: transform 0.2s ease;
-		}
-
-		.thumbnail:hover {
-			transform: scale(1.05);
 		}
 
 		/* Toggle QR code switch */
