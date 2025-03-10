@@ -69,6 +69,10 @@
 			line-height: 1.2;
 		}
 
+		.bottom-margin {
+			margin-bottom: 60px; /* Increased from 40px */
+		}
+
 		.logo {
 			font-size: 1.8rem;
 			font-weight: bold;
@@ -97,7 +101,7 @@
 			overflow: hidden;
 			display: flex;
 			flex-direction: column;
-			height: 700px;
+			height: 800px;
 		}
 
 		.chat-header, .image-header {
@@ -264,15 +268,16 @@
 		}
 
 		.image-controls {
-			padding: 0.5rem;
+			padding: 1rem;
 			background-color: #f9f9f9;
 			border-top: 1px solid #eee;
 			height: auto;
+			min-height: 150px;
 			overflow: visible;
 		}
 
 		.options-group {
-			margin-bottom: 0.4rem;
+			margin-bottom: 1rem;
 		}
 
 		.options-group label {
@@ -295,6 +300,12 @@
 
 		.style-selector {
 			position: relative;
+		}
+
+		.style-selector-container {
+			max-height: 200px;
+			overflow-y: auto;
+			margin-bottom: 1rem;
 		}
 
 		.style-selector select {
