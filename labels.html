@@ -286,16 +286,16 @@
 			100% { transform: translate(-50%, -50%) rotate(360deg); }
 		}
 
-		/* Fixed height for thumbnail gallery */
 		.thumbnail-gallery {
-			flex: 0 0 auto;
-			height: 80px;
 			display: flex;
 			overflow-x: auto;
+			white-space: nowrap;
+			width: 100%;
+			max-width: 100%;
 			padding: 0.5rem;
 			gap: 0.5rem;
 			background-color: rgba(0,0,0,0.03);
-			margin-top: 0.5rem;
+			height: 80px;
 		}
 
 		.thumbnail {
@@ -1131,7 +1131,7 @@
                 document.getElementById('qrSizeValue').textContent = `${sizePercent}%`;
             }
             
-            // Function to add a thumbnail to the gallery
+			// Function to add a thumbnail to the gallery
 			function addThumbnail(imageUrl) {
 				// Only add if it's a valid URL (not the placeholder)
 				if (imageUrl && !imageUrl.includes('data:image/svg+xml')) {
@@ -1151,28 +1151,28 @@
 						}
 					});
 					
+					// FIXED: Limit the number of thumbnails
+					const MAX_THUMBNAILS = 8;
+					
+					// Add to thumbnail gallery at the BEGINNING (prepend)
+					thumbnailGallery.prepend(thumb);
+					
 					// Add to thumbnail history array
 					thumbnailHistory.push(imageUrl);
 					
-					// FIXED: Strictly limit to maximum 8 thumbnails in the DOM
-					const MAX_THUMBNAILS = 8;
-					
-					// If we already have the maximum number of thumbnails in the DOM
-					while (thumbnailGallery.children.length >= MAX_THUMBNAILS) {
-						// Remove the oldest thumbnail from DOM
-						thumbnailGallery.removeChild(thumbnailGallery.firstChild);
+					// Remove oldest thumbnails if we exceed the maximum
+					while (thumbnailGallery.children.length > MAX_THUMBNAILS) {
+						// Remove the LAST child (oldest thumbnail) from DOM
+						thumbnailGallery.removeChild(thumbnailGallery.lastChild);
+						
+						// Also remove from the history array
+						if (thumbnailHistory.length > MAX_THUMBNAILS) {
+							thumbnailHistory.shift(); // Remove oldest from array
+						}
 					}
 					
-					// Also trim the history array if needed
-					if (thumbnailHistory.length > MAX_THUMBNAILS) {
-						thumbnailHistory = thumbnailHistory.slice(-MAX_THUMBNAILS);
-					}
-					
-					// Add to gallery
-					thumbnailGallery.appendChild(thumb);
-					
-					// Scroll to the end
-					thumbnailGallery.scrollLeft = thumbnailGallery.scrollWidth;
+					// Make sure gallery scrolls to show newest thumbnails
+					thumbnailGallery.scrollLeft = 0;
 				}
 			}
 
