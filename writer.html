@@ -270,15 +270,12 @@
         }
 
 		function generatePrompt(concept) {
-			const randomKeywords = getRandomElements(keywords, 3);
-			return `Based on this cannabis strain name: "${concept}"
-					First, create a catchy, intriguing strain release title that would grab cannabis enthusiasts' attention.
-					Then write an engaging and descriptive cannabis strain profile for Daydreamer Genetics.
-					Include elements of ${randomKeywords.join(', ')}. 
-					Format your response with the title on the first line prefixed with "TITLE: ",
-					followed by a blank line, then the strain description content.
-					Include detailed appearance, aroma, flavor, effects, and growing characteristics.
-					Make it sound professional and appealing to cannabis enthusiasts.`;
+			return `Create a brief, appealing strain description for "${concept}" by Daydreamer Genetics.
+					Keep it concise (2-3 short paragraphs maximum).
+					Be authentic and don't make up specific details you can not know.
+					Focus on the strain name vibe and general cannabis attributes.
+					Format with "TITLE:" at the beginning, followed by the description.
+					The tone should be professional but accessible to cannabis enthusiasts.`;
 		}
 
 		function generateRandomConcept() {
