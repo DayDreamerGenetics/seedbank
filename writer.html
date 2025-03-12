@@ -5,782 +5,422 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daydreamer Genetics Strain Release Generator</title>
     <style>
-        :root {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #cccccc;
-            --accent: #65B88D;
-            --accent-hover: #4E9970;
-            --secondary-accent: #9969ff;
-            --nav-height: 72px;
-        }
+		:root {
+			--bg-primary: #1a1a1a;
+			--bg-secondary: #2d2d2d;
+			--text-primary: #ffffff;
+			--text-secondary: #cccccc;
+			--accent: #7c4dff;
+			--accent-hover: #9969ff;
+			--nav-height: 72px;
+		}
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
+		body {
+			font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+			background-color: var(--bg-primary);
+			color: var(--text-primary);
+			line-height: 1.6;
+			margin: 0;
+			padding: 0;
+			min-height: 100vh;
+		}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            min-height: calc(100vh - var(--nav-height));
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding-top: var(--nav-height);
-        }
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 20px;
+			min-height: calc(100vh - var(--nav-height));
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			padding-top: var(--nav-height);
+		}
 
-        .container.has-content {
-            justify-content: flex-start;
-            padding-top: calc(var(--nav-height) + 15px);
-        }
+		.container.has-content {
+			justify-content: flex-start;
+			padding-top: calc(var(--nav-height) + 15px);
+		}
 
-        .logo {
-            max-width: 250px;
-            margin-bottom: 20px;
-        }
+		.image-container {
+			position: relative;
+			width: 100%;
+		}
 
-        .image-container {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            overflow: hidden;
-            border-radius: 8px;
-        }
+		.regenerate-image {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			background-color: rgba(124, 77, 255, 0.8);
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: background-color 0.3s;
+			border: none;
+			padding: 0;
+		}
 
-        .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+		.regenerate-image:hover {
+			background-color: var(--accent-hover);
+		}
 
-        .regenerate-image {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: rgba(101, 184, 141, 0.8);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            border: none;
-            padding: 0;
-        }
+		.regenerate-image svg {
+			width: 24px;
+			height: 24px;
+			fill: white;
+		}
 
-        .regenerate-image:hover {
-            background-color: var(--accent-hover);
-        }
+		.controls {
+			background-color: var(--bg-secondary);
+			padding: 30px;
+			border-radius: 10px;
+			width: 100%;
+			max-width: 800px;
+		}
 
-        .regenerate-image svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
-        }
+		.input-group {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+		}
 
-        .controls {
-            background-color: var(--bg-secondary);
-            padding: 30px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 30px;
-        }
+		input[type="text"] {
+			flex: 1;
+			height: 45px;
+			padding: 0 20px;
+			border: none;
+			border-radius: 5px;
+			background-color: var(--bg-primary);
+			color: var(--text-primary);
+			font-size: 16px;
+		}
 
-        .input-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
+		button {
+			height: 45px;
+			padding: 0 25px;
+			border: none;
+			border-radius: 5px;
+			background-color: var(--accent);
+			color: var(--text-primary);
+			font-size: 16px;
+			cursor: pointer;
+			transition: background-color 0.3s;
+			white-space: nowrap;
+		}
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-top: 15px;
-        }
+		button:hover {
+			background-color: var(--accent-hover);
+		}
 
-        label {
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
+		.blog-post {
+			width: 100%;
+			max-width: 800px;
+			background-color: var(--bg-secondary);
+			padding: 30px;
+			border-radius: 10px;
+			opacity: 0;
+			transform: translateY(20px);
+			transition: opacity 0.5s, transform 0.5s;
+			margin-top: 30px;
+		}
 
-        input[type="text"] {
-            flex: 1;
-            height: 45px;
-            padding: 0 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-size: 16px;
-        }
+		.blog-post.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
 
-        button {
-            height: 45px;
-            padding: 0 25px;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--accent);
-            color: var(--text-primary);
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            white-space: nowrap;
-        }
+		.blog-post article {
+			width: 100%;
+		}
 
-        button:hover {
-            background-color: var(--accent-hover);
-        }
+		.blog-post h1 {
+			margin: 0;
+			color: var(--accent);
+			font-size: 2.5em;
+			line-height: 1.3;
+			text-align: center;
+			padding: 30px 0;
+			max-width: 90%;
+			margin-left: auto;
+			margin-right: auto;
+			border-bottom: 2px solid var(--accent);
+		}
 
-        button.random {
-            background-color: var(--secondary-accent);
-        }
+		.blog-post img {
+			width: 100%;
+			height: auto;
+			border-radius: 8px;
+			margin: 0 0 20px 0;
+		}
 
-        button.random:hover {
-            background-color: #8559e0;
-        }
+		.blog-post .content {
+			color: var(--text-secondary);
+			font-size: 18px;
+			padding: 20px 0;
+			white-space: pre-line;
+			line-height: 1.8;
+		}
 
-        .strain-post {
-            width: 100%;
-            max-width: 800px;
-            background-color: var(--bg-secondary);
-            padding: 30px;
-            border-radius: 10px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s, transform 0.5s;
-            margin-top: 30px;
-        }
+		.blog-post .content p.blog-paragraph {
+			margin-bottom: 1.5em;
+			text-align: justify;
+			line-height: 1.8;
+			font-size: 18px;
+		}
 
-        .strain-post.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
+		.button-container {
+			text-align: right;
+			margin-top: 20px;
+		}
 
-        .strain-post article {
-            width: 100%;
-        }
+		.copy-button {
+			display: inline-block;
+			margin-left: auto;
+			background-color: var(--accent);
+			color: white;
+			padding: 10px 20px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
 
-        .strain-post h1 {
-            margin: 0;
-            color: var(--accent);
-            font-size: 2.5em;
-            line-height: 1.3;
-            text-align: center;
-            padding: 30px 0;
-            max-width: 90%;
-            margin-left: auto;
-            margin-right: auto;
-            border-bottom: 2px solid var(--accent);
-        }
+		.loading {
+			text-align: center;
+			padding: 20px;
+			display: none;
+		}
 
-        .strain-post .genetics {
-            text-align: center;
-            font-size: 1.2em;
-            color: var(--secondary-accent);
-            margin-top: 15px;
-            font-style: italic;
-        }
+		.loading:after {
+			content: "...";
+			animation: dots 1.5s steps(5, end) infinite;
+		}
 
-        .strain-post img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 0 0 20px 0;
-        }
-
-        .strain-post .content {
-            color: var(--text-secondary);
-            font-size: 18px;
-            padding: 20px 0;
-            white-space: pre-line;
-            line-height: 1.8;
-        }
-
-        .strain-post .content p.strain-paragraph {
-            margin-bottom: 1.5em;
-            text-align: justify;
-            line-height: 1.8;
-            font-size: 18px;
-        }
-
-        .strain-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .meta-item {
-            background-color: var(--bg-primary);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .meta-item.thc {
-            border: 1px solid #65B88D;
-            color: #65B88D;
-        }
-
-        .meta-item.terpene {
-            border: 1px solid #9969ff;
-            color: #9969ff;
-        }
-
-        .meta-item.effect {
-            border: 1px solid #ff6969;
-            color: #ff6969;
-        }
-
-        .meta-item.grow {
-            border: 1px solid #69b0ff;
-            color: #69b0ff;
-        }
-
-        .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--accent);
-            text-align: center;
-            color: var(--text-secondary);
-        }
-
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
-        }
-
-        .social-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .social-links a:hover {
-            color: var(--accent);
-        }
-
-        .button-container {
-            text-align: right;
-            margin-top: 20px;
-        }
-
-        .copy-button {
-            display: inline-block;
-            margin-left: auto;
-            background-color: var(--accent);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
-
-        .loading:after {
-            content: "...";
-            animation: dots 1.5s steps(5, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: "."; }
-            40% { content: ".."; }
-            60%, 100% { content: "..."; }
-        }
+		@keyframes dots {
+			0%, 20% { content: "."; }
+			40% { content: ".."; }
+			60%, 100% { content: "..."; }
+		}
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="https://via.placeholder.com/250x100?text=Daydreamer+Genetics" alt="Daydreamer Genetics Logo" class="logo">
         <div class="controls">
             <div class="input-group">
-                <input type="text" id="strainNameInput" placeholder="Enter strain name or click Random Strain">
-                <button onclick="generateStrainPost()">Generate Strain Post</button>
-                <button onclick="generateRandomStrainPost()" class="random">Random Strain</button>
-            </div>
-            <div class="input-group">
-                <input type="text" id="geneticsInput" placeholder="Enter genetics (e.g., Strain A x Strain B) or leave blank for random">
-            </div>
-            <div class="checkbox-group">
-                <label><input type="checkbox" id="includeThcCbd" checked> Include THC/CBD levels</label>
-                <label><input type="checkbox" id="includeTerpenes" checked> Include terpene profile</label>
-                <label><input type="checkbox" id="includeEffects" checked> Include effects</label>
-                <label><input type="checkbox" id="includeGrowInfo" checked> Include grow info</label>
+                <input type="text" id="topicInput" placeholder="Enter strain name or click Random">
+                <button onclick="generatePost()">Generate Strain Post</button>
+                <button onclick="generateRandomPost()">Random Strain</button>
             </div>
         </div>
         <div id="loading" class="loading">Generating your strain release</div>
-        <div id="strainPost" class="strain-post"></div>
+        <div id="blogPost" class="blog-post"></div>
     </div>
 
     <script>
-        const strainTypes = [
-            "Indica dominant", 
-            "Sativa dominant", 
-            "Hybrid", 
-            "Balanced hybrid", 
-            "Indica leaning hybrid", 
-            "Sativa leaning hybrid"
-        ];
+		const phenomena = [
+			"Purple Kush",
+			"Dream Cookies",
+			"Gelato OG",
+			"Wedding Cake",
+			"Diesel Haze",
+			"Blue Dream",
+			"Gorilla Glue",
+			"Northern Lights",
+			"Sour Diesel",
+			"Girl Scout Cookies"
+		];
 
-        const strainPrefixes = [
-            "Purple", "Dream", "Gelato", "Kush", "OG", "Haze", "Skunk", "Diesel", 
-            "Cookies", "Glue", "Cake", "Zkittlez", "Runtz", "Punch", "Breath", "Cream",
-            "Berry", "Blue", "Sour", "Sweet", "Fire", "Ice", "Lemon", "Citrus",
-            "Cherry", "Banana", "Mango", "Melon", "Orange", "Grape", "Apple", "Wedding",
-            "Ghost", "Sunset", "Northern", "Tropical", "Frosty", "Golden", "Silver", "Diamond"
-        ];
+		const locations = [
+			"indica-dominant hybrid",
+			"sativa-dominant hybrid",
+			"balanced hybrid",
+			"pure indica",
+			"pure sativa",
+			"exotic hybrid",
+			"autoflowering variety",
+			"CBD-rich strain",
+			"high-THC variety",
+			"medicinal strain"
+		];
 
-        const strainSuffixes = [
-            "Kush", "Haze", "Diesel", "Cookies", "Cake", "Glue", "Punch", "Breath", 
-            "Dream", "OG", "Zkittlez", "Runtz", "Cream", "Berry", "Candy", "Juice",
-            "Fruit", "Skunk", "Walker", "Stomper", "Fuel", "Gas", "Bomb", "Widow",
-            "Cheese", "Wreck", "Star", "Moon", "Lights", "Sunrise", "Sunset", "Haze"
-        ];
-
-        const legacyStrains = [
-            "Northern Lights", "OG Kush", "Granddaddy Purple", "Sour Diesel", "Blue Dream",
-            "Girl Scout Cookies", "White Widow", "Jack Herer", "Durban Poison", "Chemdawg",
-            "Skunk #1", "Super Silver Haze", "AK-47", "Pineapple Express", "Gorilla Glue",
-            "Wedding Cake", "Gelato", "GSC", "Bubba Kush", "Purple Punch"
-        ];
-
-        const modernStrains = [
-            "Runtz", "Zkittlez", "GMO Cookies", "Ice Cream Cake", "Mimosa", 
-            "Tropicana Cookies", "Slurricane", "Apple Fritter", "Kush Mints", "Garlic Breath",
-            "MAC", "Rainbow Belts", "Jealousy", "Gary Payton", "London Pound Cake",
-            "Cereal Milk", "Sunset Sherbert", "Apples & Bananas", "Marshmallow OG", "RS11"
-        ];
-
-        const terpenes = [
-            "Myrcene", "Limonene", "Caryophyllene", "Pinene", "Linalool", 
-            "Humulene", "Terpinolene", "Ocimene", "Bisabolol", "Nerolidol",
-            "Terpineol", "Valencene", "Geraniol", "Borneol", "Phytol"
-        ];
-
-        const terpeneFlavors = {
-            "Myrcene": ["earthy", "musky", "herbal", "mango"],
-            "Limonene": ["citrus", "lemon", "orange", "grapefruit"],
-            "Caryophyllene": ["peppery", "spicy", "woody", "cloves"],
-            "Pinene": ["pine", "forest", "herbal", "rosemary"],
-            "Linalool": ["floral", "lavender", "sweet", "citrus"],
-            "Humulene": ["hoppy", "earthy", "woody", "spicy"],
-            "Terpinolene": ["floral", "pine", "herbal", "citrus"],
-            "Ocimene": ["sweet", "woody", "herbal", "citrus"],
-            "Bisabolol": ["floral", "sweet", "chamomile", "mild"],
-            "Nerolidol": ["woody", "fruity", "apple", "rose"],
-            "Terpineol": ["lilac", "pine", "lime", "floral"],
-            "Valencene": ["citrus", "orange", "sweet", "tangy"],
-            "Geraniol": ["rose", "floral", "fruity", "peach"],
-            "Borneol": ["menthol", "earthy", "camphor", "mint"],
-            "Phytol": ["floral", "grassy", "light", "delicate"]
-        };
-
-        const terpeneEffects = {
-            "Myrcene": ["relaxing", "sedative", "calming", "sleep-inducing"],
-            "Limonene": ["uplifting", "mood-enhancing", "stress-relieving", "energizing"],
-            "Caryophyllene": ["stress-relieving", "anti-inflammatory", "calming", "balancing"],
-            "Pinene": ["alertness", "memory-enhancing", "focus-improving", "energizing"],
-            "Linalool": ["relaxing", "anti-anxiety", "mood-enhancing", "calming"],
-            "Humulene": ["appetite-suppressing", "anti-inflammatory", "earthy", "grounding"],
-            "Terpinolene": ["uplifting", "energizing", "creative", "focus-enhancing"],
-            "Ocimene": ["uplifting", "energizing", "mood-enhancing", "stimulating"],
-            "Bisabolol": ["soothing", "anti-inflammatory", "calming", "gentle"],
-            "Nerolidol": ["relaxing", "sedative", "calming", "tranquil"],
-            "Terpineol": ["relaxing", "calming", "sedative", "peaceful"],
-            "Valencene": ["uplifting", "energizing", "focus-enhancing", "refreshing"],
-            "Geraniol": ["uplifting", "mood-enhancing", "balancing", "harmonizing"],
-            "Borneol": ["calming", "grounding", "balancing", "centering"],
-            "Phytol": ["mild", "subtle", "gentle", "balanced"]
-        };
-
-        const effects = {
-            "Indica dominant": ["relaxed", "sleepy", "calm", "pain relief", "body high", "couch-lock", "tranquil", "appetite stimulation", "stress relief", "sedative"],
-            "Sativa dominant": ["energetic", "creative", "uplifted", "focused", "cerebral", "euphoric", "social", "productive", "motivated", "mood-enhancing"],
-            "Hybrid": ["balanced", "euphoric", "uplifting", "relaxing", "creative", "sociable", "pain relief", "stress relief", "mood-enhancing", "clear-headed"]
-        };
-
-        const growCharacteristics = [
-            "short flowering time", "high yield", "mold resistant", "pest resistant", 
-            "cold resistant", "heat resistant", "drought tolerant", "beginner friendly", 
-            "heavy feeder", "light feeder", "compact growth", "tall growth", 
-            "bushy structure", "stretchy structure", "vigorous vegetative growth",
-            "heavy resin production", "colorful buds", "dense buds", "airy buds",
-            "fast vegetative growth", "responds well to training", "huge trichome production"
+		const implications = [
+			"perfect for relaxation",
+			"ideal for creativity",
+			"great for pain relief",
+			"excellent for sleep",
+			"helps with anxiety",
+			"energizing effects",
+			"mood-enhancing properties",
+			"high yield potential",
+			"exceptional bag appeal",
+			"unique terpene profile"
+		];
+		
+        const keywords = [
+            "resinous", "terpenes", "potent", "frosty", "trichomes",
+            "euphoric", "relaxing", "uplifting", "medicinal", 
+            "indoor", "outdoor", "exotic", "premium", "artisanal",
+            "advanced", "rare", "exclusive", "therapeutic", "flavorful"
         ];
 
         function getRandomElements(arr, count) {
             return arr.sort(() => 0.5 - Math.random()).slice(0, count);
         }
 
-        function getRandomFloat(min, max) {
-            return (Math.random() * (max - min) + min).toFixed(1);
+		function generatePrompt(concept) {
+			const randomKeywords = getRandomElements(keywords, 3);
+			return `Based on this cannabis strain name: "${concept}"
+					First, create a catchy, intriguing strain release title that would grab cannabis enthusiasts' attention.
+					Then write an engaging and descriptive cannabis strain profile for Daydreamer Genetics.
+					Include elements of ${randomKeywords.join(', ')}. 
+					Format your response with the title on the first line prefixed with "TITLE: ",
+					followed by a blank line, then the strain description content.
+					Include detailed appearance, aroma, flavor, effects, and growing characteristics.
+					Make it sound professional and appealing to cannabis enthusiasts.`;
+		}
+
+		function generateRandomConcept() {
+			const phenomenon = phenomena[Math.floor(Math.random() * phenomena.length)];
+			const location = locations[Math.floor(Math.random() * locations.length)];
+			const implication = implications[Math.floor(Math.random() * implications.length)];
+			
+			return `${phenomenon}, a ${location}, ${implication}`;
+		}
+
+		async function generatePost() {
+			const topicInput = document.getElementById('topicInput');
+			const concept = topicInput.value.trim() || generateRandomConcept();
+			const seed = Math.floor(Math.random() * 1000000);
+			
+			document.getElementById('loading').style.display = 'block';
+			const blogPost = document.getElementById('blogPost');
+			blogPost.classList.remove('visible');
+
+			try {
+				const articleResponse = await fetch('https://text.pollinations.ai/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						messages: [
+							{
+								role: 'system',
+								content: `You are a cannabis strain description writer for Daydreamer Genetics. 
+								You specialize in creating compelling, informative, and enticing descriptions
+								of cannabis strains that highlight their unique characteristics, effects, and growing traits.
+								Your writing style is professional yet engaging, with accurate cannabis terminology
+								and vivid sensory descriptions.`
+							},
+							{
+								role: 'user',
+								content: generatePrompt(concept)
+							}
+						],
+						model: 'openai',
+						seed: seed
+					})
+				});
+
+				const articleData = await articleResponse.text();
+				
+				const titleMatch = articleData.match(/TITLE:\s*(.+?)(?:\n|$)/);
+				const title = titleMatch ? titleMatch[1].trim() : concept;
+				
+				const cleanArticleData = articleData
+					.replace(/TITLE:\s*.+?\n/, '')
+					.replace(/^[#*]+ ?.*?\n+/g, '')
+					.replace(/\*\*/g, '')
+					.trim();
+				
+				const imagePrompt = `cannabis strain ${concept}, close-up of marijuana buds with visible trichomes, cannabis flowers, professional photography, high resolution, detailed`;
+				const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=400&nologo=true`;
+
+				blogPost.innerHTML = `
+					<article>
+						<div class="image-container">
+							<img src="${imageUrl}" alt="${title}">
+							<button class="regenerate-image" onclick="regenerateImage('${imagePrompt}')">
+								<svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+							</button>
+						</div>
+						<h1>${title}</h1>
+						<div class="content">
+							${cleanArticleData.split('\n\n').map(paragraph => 
+								`<p class="blog-paragraph">${paragraph}</p>`
+							).join('')}
+						</div>
+						<div class="footer">
+							<p>© ${new Date().getFullYear()} Daydreamer Genetics</p>
+							<p>www.daydreamergenetics.com | Instagram: @daydreamergenetics</p>
+						</div>
+						<div class="button-container">
+							<button id="copyButton" class="copy-button">Copy Formatted Post</button>
+						</div>
+					</article>
+				`;
+
+				document.getElementById('copyButton').onclick = copyFormattedPost;
+				
+				document.getElementById('loading').style.display = 'none';
+				blogPost.classList.add('visible');
+
+			} catch (error) {
+				console.error('Error:', error);
+				document.getElementById('loading').style.display = 'none';
+				blogPost.innerHTML = '<p>Error generating strain post. Please try again.</p>';
+				blogPost.classList.add('visible');
+			}
+		}
+		
+		function regenerateImage(imagePrompt) {
+			const img = document.querySelector('.image-container img');
+			const newSeed = Math.floor(Math.random() * 1000000);
+			const newImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=400&nologo=true&seed=${newSeed}`;
+			
+			img.style.opacity = '0.5';
+			const newImage = new Image();
+			newImage.onload = () => {
+				img.src = newImageUrl;
+				img.style.opacity = '1';
+			};
+			newImage.src = newImageUrl;
+		}		
+		
+        function generateRandomPost() {
+            document.getElementById('topicInput').value = '';
+            generatePost();
         }
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+		function copyFormattedPost() {
+			const blogPost = document.getElementById('blogPost');
+			if (!blogPost.querySelector('article')) return;
 
-        function generateRandomStrainName() {
-            const rand = Math.random();
-            let strainName;
-            
-            if (rand < 0.3) {
-                // Classic strain
-                strainName = legacyStrains[Math.floor(Math.random() * legacyStrains.length)];
-            } else if (rand < 0.6) {
-                // Modern strain
-                strainName = modernStrains[Math.floor(Math.random() * modernStrains.length)];
-            } else {
-                // Generate new name
-                const useSuffix = Math.random() > 0.5;
-                const prefix = strainPrefixes[Math.floor(Math.random() * strainPrefixes.length)];
-                
-                if (useSuffix) {
-                    const suffix = strainSuffixes[Math.floor(Math.random() * strainSuffixes.length)];
-                    strainName = `${prefix} ${suffix}`;
-                } else {
-                    strainName = prefix;
-                }
-            }
-            
-            return strainName;
-        }
-
-        function generateRandomGenetics() {
-            const parent1 = generateRandomStrainName();
-            const parent2 = generateRandomStrainName();
-            return `${parent1} × ${parent2}`;
-        }
-
-        function generatePrompt(strainName, genetics, includeThcCbd, includeTerpenes, includeEffects, includeGrowInfo) {
-            const strainType = strainTypes[Math.floor(Math.random() * strainTypes.length)];
-            
-            let prompt = `Create an exciting cannabis strain release post for Daydreamer Genetics' new strain: "${strainName}".
-
-First, create a catchy, attention-grabbing title that features the strain name prominently.
-
-Then write an engaging and descriptive strain profile that includes:
-- A brief introduction to this ${strainType.toLowerCase()} strain
-- Detailed description of appearance, aroma, and flavor profile
-- The strain's lineage: ${genetics || "[will be generated randomly]"}`;
-
-            if (includeThcCbd) {
-                prompt += `
-- THC and CBD percentages`;
-            }
-
-            if (includeTerpenes) {
-                prompt += `
-- Dominant terpene profile and the flavors they contribute`;
-            }
-
-            if (includeEffects) {
-                prompt += `
-- Effects and potential medical benefits`;
-            }
-
-            if (includeGrowInfo) {
-                prompt += `
-- Growing characteristics (flowering time, yield, structure, etc.)`;
-            }
-
-            prompt += `
-- A compelling conclusion about why this strain is special
-
-Format your response with the title on the first line prefixed with "TITLE: ", the genetics on the second line prefixed with "GENETICS: ", followed by a blank line, then the strain description content.
-
-Make it sound professional, enthusiastic, and appealing to cannabis enthusiasts. Use vivid sensory descriptions and cannabis terminology accurately.`;
-
-            return prompt;
-        }
-
-        async function generateStrainPost() {
-            const strainNameInput = document.getElementById('strainNameInput');
-            const geneticsInput = document.getElementById('geneticsInput');
-            
-            const strainName = strainNameInput.value.trim() || generateRandomStrainName();
-            const genetics = geneticsInput.value.trim() || generateRandomGenetics();
-            
-            const includeThcCbd = document.getElementById('includeThcCbd').checked;
-            const includeTerpenes = document.getElementById('includeTerpenes').checked;
-            const includeEffects = document.getElementById('includeEffects').checked;
-            const includeGrowInfo = document.getElementById('includeGrowInfo').checked;
-            
-            const seed = Math.floor(Math.random() * 1000000);
-            
-            document.getElementById('loading').style.display = 'block';
-            const strainPost = document.getElementById('strainPost');
-            strainPost.classList.remove('visible');
-
-            try {
-                // For demo purposes, we'll simulate the API call
-                // In a real implementation, you would replace this with your actual API call
-                // const articleResponse = await fetch('https://text.pollinations.ai/', {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify({
-                //         messages: [
-                //             {
-                //                 role: 'system',
-                //                 content: `You are a cannabis strain description writer for a premium seed bank. 
-                //                 You specialize in creating compelling, informative, and enticing descriptions
-                //                 of cannabis strains that highlight their unique characteristics, effects, and growing traits.
-                //                 Your writing style is professional yet engaging, with accurate cannabis terminology
-                //                 and vivid sensory descriptions.`
-                //             },
-                //             {
-                //                 role: 'user',
-                //                 content: generatePrompt(strainName, genetics, includeThcCbd, includeTerpenes, includeEffects, includeGrowInfo)
-                //             }
-                //         ],
-                //         model: 'openai',
-                //         seed: seed
-                //     })
-                // });
-                // const articleData = await articleResponse.text();
-                
-                // Simulate API response with sample data
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                // Create sample data for demo
-                const strainType = strainTypes[Math.floor(Math.random() * strainTypes.length)];
-                const dominantTerpenes = getRandomElements(terpenes, 3);
-                
-                let thcLevel = getRandomFloat(15, 30);
-                let cbdLevel = getRandomFloat(0.1, 2.0);
-                
-                if (strainType.includes("Indica")) {
-                    thcLevel = getRandomFloat(18, 30);
-                } else if (strainType.includes("Sativa")) {
-                    thcLevel = getRandomFloat(16, 28);
-                }
-                
-                const floweringTime = getRandomInt(8, 11);
-                const yield_indoor = getRandomInt(400, 700);
-                const yield_outdoor = getRandomInt(500, 1200);
-                
-                const selectedEffects = effects[strainType] ? 
-                    getRandomElements(effects[strainType], 5) : 
-                    getRandomElements([...effects["Indica dominant"], ...effects["Sativa dominant"]], 5);
-                
-                const selectedGrowTraits = getRandomElements(growCharacteristics, 4);
-                
-                const terpeneDescriptions = dominantTerpenes.map(terpene => {
-                    const flavors = getRandomElements(terpeneFlavors[terpene], 2);
-                    return `${terpene} (${flavors.join(", ")})`;
-                }).join(", ");
-                
-                const mockTitle = `TITLE: Introducing ${strainName} - Daydreamer Genetics' Latest Creation`;
-                const mockGenetics = `GENETICS: ${genetics}`;
-                
-                let mockContent = `Step into a world of exceptional cannabis with Daydreamer Genetics' newest ${strainType.toLowerCase()} release, ${strainName}. This extraordinary strain represents the pinnacle of our breeding program, combining premium genetics with meticulous selection.
-
-${strainName} produces dense, resinous buds that glisten with trichomes, often displaying vibrant hues of green with subtle purple undertones and bright orange pistils. The bag appeal is simply outstanding, making this strain a true eye-catcher in any collection.`;
-
-                if (includeTerpenes) {
-                    mockContent += `\n\nThe terpene profile is dominated by ${terpeneDescriptions}, creating a complex aroma that fills the room with its presence. The flavor follows through on the promise of the scent, delivering a smooth smoke with distinct notes that linger pleasantly on the palate.`;
-                }
-
-                if (includeThcCbd) {
-                    mockContent += `\n\nWith average THC levels testing at ${thcLevel}% and CBD at ${cbdLevel}%, ${strainName} offers potent effects while maintaining a balanced experience.`;
-                }
-
-                if (includeEffects) {
-                    mockContent += `\n\nUsers report a distinctive high characterized by ${selectedEffects.join(", ")}, making this strain perfect for ${Math.random() > 0.5 ? "evening relaxation" : "daytime enjoyment"} depending on your tolerance and dosage.`;
-                }
-
-                if (includeGrowInfo) {
-                    mockContent += `\n\nGrowers will appreciate ${strainName}'s ${selectedGrowTraits.join(", ")}. Expect a flowering time of approximately ${floweringTime} weeks with yields of ${yield_indoor}g/m² indoors or ${yield_outdoor}g/plant outdoors under optimal conditions.`;
-                }
-
-                mockContent += `\n\n${strainName} stands as a testament to Daydreamer Genetics' commitment to breeding excellence. Whether you're a connoisseur seeking new experiences or a grower looking for exceptional genetics, this strain delivers on all fronts. Limited seed packs available now.`;
-
-                const articleData = `${mockTitle}\n${mockGenetics}\n\n${mockContent}`;
-                
-                const titleMatch = articleData.match(/TITLE:\s*(.+?)(?:\n|$)/);
-                const geneticsMatch = articleData.match(/GENETICS:\s*(.+?)(?:\n|$)/);
-                
-                const title = titleMatch ? titleMatch[1].trim() : strainName;
-                const finalGenetics = geneticsMatch ? geneticsMatch[1].trim() : genetics;
-                
-                const cleanArticleData = articleData
-                    .replace(/TITLE:\s*.+?\n/, '')
-                    .replace(/GENETICS:\s*.+?\n/, '')
-                    .replace(/^[#*]+ ?.*?\n+/g, '')
-                    .replace(/\*\*/g, '')
-                    .trim();
-                
-                // Create a strain-specific image prompt
-                const imagePrompt = `high quality photograph of cannabis strain ${strainName}, close-up of marijuana buds with visible trichomes, cannabis flowers, professional photography, high resolution, detailed`;
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=400&nologo=true&seed=${seed}`;
-
-                // Generate random strain details for display
-                const randomTerpenes = getRandomElements(terpenes, 3);
-                const randomEffects = getRandomElements(selectedEffects, 4);
-                const randomGrowTraits = getRandomElements(selectedGrowTraits, 2);
-
-                strainPost.innerHTML = `
-                    <article>
-                        <div class="image-container">
-                            <img src="${imageUrl}" alt="${strainName} cannabis strain">
-                            <button class="regenerate-image" onclick="regenerateImage('${imagePrompt}')">
-                                <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                            </button>
-                        </div>
-                        <h1>${title}</h1>
-                        <div class="genetics">${finalGenetics}</div>
-                        <div class="content">
-                            ${cleanArticleData.split('\n\n').map(paragraph => 
-                                `<p class="strain-paragraph">${paragraph}</p>`
-                            ).join('')}
-                        </div>
-
-                        <div class="strain-meta">
-                            ${includeThcCbd ? `
-                            <span class="meta-item thc">THC: ${thcLevel}%</span>
-                            <span class="meta-item thc">CBD: ${cbdLevel}%</span>
-                            ` : ''}
-                            
-                            ${includeTerpenes ? randomTerpenes.map(terpene => 
-                                `<span class="meta-item terpene">${terpene}</span>`
-                            ).join('') : ''}
-                            
-                            ${includeEffects ? randomEffects.map(effect => 
-                                `<span class="meta-item effect">${effect}</span>`
-                            ).join('') : ''}
-                            
-                            ${includeGrowInfo ? randomGrowTraits.map(trait => 
-                                `<span class="meta-item grow">${trait}</span>`
-                            ).join('') : ''}
-                        </div>
-
-                        <div class="footer">
-                            <p>© ${new Date().getFullYear()} Daydreamer Genetics. All rights reserved.</p>
-                            <div class="social-links">
-                                <a href="https://www.daydreamergenetics.com" target="_blank">www.daydreamergenetics.com</a> | 
-                                <a href="https://www.instagram.com/daydreamergenetics" target="_blank">@daydreamergenetics</a>
-                            </div>
-                        </div>
-
-                        <div class="button-container">
-                            <button id="copyButton" class="copy-button">Copy Formatted Post</button>
-                        </div>
-                    </article>
-                `;
-
-                document.getElementById('copyButton').onclick = copyFormattedPost;
-                
-                document.getElementById('loading').style.display = 'none';
-                strainPost.classList.add('visible');
-                document.querySelector('.container').classList.add('has-content');
-
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('loading').style.display = 'none';
-                strainPost.innerHTML = '<p>Error generating strain post. Please try again.</p>';
-                strainPost.classList.add('visible');
-            }
-        }
-        
-        function regenerateImage(promptText) {
-            const img = document.querySelector('.image-container img');
-            const newSeed = Math.floor(Math.random() * 1000000);
-            const newImageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(promptText)}?width=800&height=400&nologo=true&seed=${newSeed}`;
-            
-            img.style.opacity = '0.5';
-            const newImage = new Image();
-            newImage.onload = () => {
-                img.src = newImageUrl;
-                img.style.opacity = '1';
-            };
-            newImage.src = newImageUrl;
-        }        
-        
-        function generateRandomStrainPost() {
-            document.getElementById('strainNameInput').value = '';
-            document.getElementById('geneticsInput').value = '';
-            generateStrainPost();
-        }
-
-        function copyFormattedPost() {
-            const strainPost = document.getElementById('strainPost');
-            if (!strainPost.querySelector('article')) return;
-
-            const title = strainPost.querySelector('h1').innerText;
-            const genetics = strainPost.querySelector('.genetics').innerText;
-            const paragraphs = Array.from(strainPost.querySelectorAll('.strain-paragraph'));
-            
-            // Create text with proper line breaks and Daydreamer Genetics info
-            const formattedContent = `${title}\n\n${genetics}\n\n${paragraphs.map(p => p.innerText).join('\n\n')}\n\n© ${new Date().getFullYear()} Daydreamer Genetics\nwww.daydreamergenetics.com | @daydreamergenetics`;
-            
-            // Use newer clipboard API for better text handling
-            navigator.clipboard.writeText(formattedContent)
-                .then(() => {
-                    const button = document.getElementById('copyButton');
-                    button.textContent = 'Copied!';
-                    setTimeout(() => {
-                        button.textContent = 'Copy Formatted Post';
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Failed to copy:', err);
-                });
-        }
-        
-        // Enhancement: Add keyboard shortcut to generate on Enter
-        document.getElementById('strainNameInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generateStrainPost();
-            }
-        });
-        
-        document.getElementById('geneticsInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                generateStrainPost();
-            }
-        });
-        
-        // Set placeholder images for multiple seeds/variations
-        const placeholderStrains = [
-            "Purple Kush",
-            "Blue Dream",
-            "Wedding Cake",
-            "Gelato",
-            "OG Haze",
-            "Tropical Runtz"
-        ];
-        
-        // Initialize with random placeholder suggestions
-        window.onload = function() {
-            const randomPlaceholder = placeholderStrains[Math.floor(Math.random() * placeholderStrains.length)];
-            document.getElementById('strainNameInput').placeholder = `Enter strain name (e.g., ${randomPlaceholder})`;
-            document.getElementById('strainNameInput').value = '';
-            document.getElementById('geneticsInput').value = '';
-        };
+			const title = blogPost.querySelector('h1').innerText;
+			const paragraphs = Array.from(blogPost.querySelectorAll('.blog-paragraph'));
+			
+			// Create text with proper line breaks and Daydreamer Genetics info
+			const formattedContent = `${title}\n\n${paragraphs.map(p => p.innerText).join('\n\n')}\n\n© ${new Date().getFullYear()} Daydreamer Genetics\nwww.daydreamergenetics.com | Instagram: @daydreamergenetics`;
+			
+			// Use newer clipboard API for better text handling
+			navigator.clipboard.writeText(formattedContent)
+				.then(() => {
+					const button = document.getElementById('copyButton');
+					button.textContent = 'Copied!';
+					setTimeout(() => {
+						button.textContent = 'Copy Formatted Post';
+					}, 2000);
+				})
+				.catch(err => {
+					console.error('Failed to copy:', err);
+				});
+		}
+		
+		window.onload = function() {
+			document.getElementById('topicInput').value = '';
+		};
     </script>
 </body>
 </html>
