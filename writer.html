@@ -240,51 +240,6 @@
     </div>
 
     <script>
-		const phenomena = [
-			"Purple Kush",
-			"Dream Cookies",
-			"Gelato OG",
-			"Wedding Cake",
-			"Diesel Haze",
-			"Blue Dream",
-			"Gorilla Glue",
-			"Northern Lights",
-			"Sour Diesel",
-			"Girl Scout Cookies"
-		];
-
-		const locations = [
-			"indica-dominant hybrid",
-			"sativa-dominant hybrid",
-			"balanced hybrid",
-			"pure indica",
-			"pure sativa",
-			"exotic hybrid",
-			"autoflowering variety",
-			"CBD-rich strain",
-			"high-THC variety",
-			"medicinal strain"
-		];
-
-		const implications = [
-			"perfect for relaxation",
-			"ideal for creativity",
-			"great for pain relief",
-			"excellent for sleep",
-			"helps with anxiety",
-			"energizing effects",
-			"mood-enhancing properties",
-			"high yield potential",
-			"exceptional bag appeal",
-			"unique terpene profile"
-		];
-		
-        const keywords = [
-            "resinous", "terpenes", "potent", "frosty", "trichomes",
-            "euphoric", "relaxing", "uplifting", "medicinal", 
-            "indoor", "outdoor", "exotic", "premium", "artisanal",
-            "advanced", "rare", "exclusive", "therapeutic", "flavorful"
-        ];
 
         function getRandomElements(arr, count) {
             return arr.sort(() => 0.5 - Math.random()).slice(0, count);
@@ -293,10 +248,11 @@
 		function generatePrompt(concept) {
 			return `Create a brief, appealing strain description for "${concept}" by Daydreamer Genetics.
 					Keep it concise (2-3 short paragraphs maximum).
-					Be authentic and don't make up specific details you can not know.
+					Be authentic and do not make up specific details you cannot know.
 					Focus on the strain name vibe and general cannabis attributes.
 					Format with "TITLE:" at the beginning, followed by the description.
-					The tone should be professional but accessible to cannabis enthusiasts.`;
+					The tone should be professional but accessible to cannabis enthusiasts.
+					Do not use any special characters, markdown, or formatting - use plain text only.`;
 		}
 
 		function generateRandomConcept() {
@@ -307,143 +263,119 @@
 			return `${phenomenon}, a ${location}, ${implication}`;
 		}
 
-async function generatePost() {
-    const topicInput = document.getElementById('topicInput');
-    const concept = topicInput.value.trim() || generateRandomConcept();
-    const seed = Math.floor(Math.random() * 1000000);
-    
-    document.getElementById('loading').style.display = 'block';
-    const blogPost = document.getElementById('blogPost');
-    blogPost.classList.remove('visible');
+		async function generatePost() {
+			const topicInput = document.getElementById('topicInput');
+			const concept = topicInput.value.trim() || generateRandomConcept();
+			const seed = Math.floor(Math.random() * 1000000);
+			
+			document.getElementById('loading').style.display = 'block';
+			const blogPost = document.getElementById('blogPost');
+			blogPost.classList.remove('visible');
 
-    try {
-        const articleResponse = await fetch('https://text.pollinations.ai/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are a cannabis strain description writer for Daydreamer Genetics. 
-                        Keep your writing clean and professional - do NOT use asterisks, 
-                        markdown, or special formatting characters in your responses.
-                        Write naturally with plain text only.
-                        Your writing style is professional yet engaging, with accurate cannabis terminology
-                        and vivid sensory descriptions.`
-                    },
-                    {
-                        role: 'user',
-                        content: generatePrompt(concept)
-                    }
-                ],
-                model: 'openai',
-                seed: seed
-            })
-        });
+			try {
+				const articleResponse = await fetch('https://text.pollinations.ai/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						messages: [
+							{
+								role: 'system',
+								content: `You are a cannabis strain description writer for Daydreamer Genetics. 
+								Keep your writing clean and professional - do NOT use asterisks, 
+								markdown, or special formatting characters in your responses.
+								Write naturally with plain text only.
+								Your writing style is professional yet engaging, with accurate cannabis terminology
+								and vivid sensory descriptions.`
+							},
+							{
+								role: 'user',
+								content: generatePrompt(concept)
+							}
+						],
+						model: 'openai',
+						seed: seed
+					})
+				});
 
-        const articleData = await articleResponse.text();
-        
-        const titleMatch = articleData.match(/TITLE:\s*(.+?)(?:\n|$)/);
-        let title = titleMatch ? titleMatch[1].trim() : concept;
-        // Remove any asterisks or other markdown characters
-        title = title.replace(/[\*\#\_\~\`]/g, '');
-        
-        const cleanArticleData = articleData
-            .replace(/TITLE:\s*.+?\n/, '')
-            .replace(/^[#*]+ ?.*?\n+/g, '')
-            .replace(/\*\*/g, '')
-            .trim();
-        
-        const imagePrompt = `detailed ${title} promotional logo including the cannabis strain name in TEXT with vibrant colors, bold lines, intense label design, high contrast, premium branding, excessive cannabis imagery, high resolution, include visual rendering styles`;
-        const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=400&nologo=true&model=flux&enhance=true`;
-		const audioText = `${title}. ${cleanArticleData}`;
-		const audioUrl = await generateAudio(audioText, { voice: 'nova' });
-		blogPost.innerHTML = `
-			<article>
-				<div class="image-container">
-					<img src="${imageUrl}" alt="${title}">
-					<button class="regenerate-image" onclick="regenerateImage('${encodeURIComponent(imagePrompt)}')">
-						<svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-					</button>
-				</div>
-				<h1>${title}</h1>
-				<div class="content">
-					${cleanArticleData.split('\n\n').map(paragraph => 
-						`<p class="blog-paragraph">${paragraph}</p>`
-					).join('')}
-				</div>
-				<div class="audio-controls">
-					<h3>Listen to Description</h3>
-					<audio controls id="description-audio" class="audio-player">
-						<source src="${audioUrl}" type="audio/mpeg" id="audio-source">
-					</audio>
-				</div>
-				<div class="footer">
-					<p>© ${new Date().getFullYear()} Daydreamer Genetics</p>
-					<p>www.daydreamergenetics.com | Instagram: @daydreamergenetics</p>
-				</div>
-				<div class="button-container">
-					<button id="copyButton" class="copy-button">Copy Formatted Post</button>
-				</div>
-			</article>
-		`;
+				const articleData = await articleResponse.text();
+				
+				const titleMatch = articleData.match(/TITLE:\s*(.+?)(?:\n|$)/);
+				let title = titleMatch ? titleMatch[1].trim() : concept;
+				// Remove any asterisks or other markdown characters
+				title = title.replace(/[\*\#\_\~\`]/g, '');
+				
+				const cleanArticleData = articleData
+					.replace(/TITLE:\s*.+?\n/, '')
+					.replace(/^[#*]+ ?.*?\n+/g, '')
+					.replace(/\*\*/g, '')
+					.trim();
+				
+				const imagePrompt = `detailed ${title} promotional logo including the cannabis strain name in TEXT with vibrant colors, bold lines, intense label design, high contrast, premium branding, excessive cannabis imagery, high resolution, include visual rendering styles`;
+				const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=400&nologo=true&model=flux&enhance=true`;
+				const audioText = `${title}. ${cleanArticleData}`;
+				const audioUrl = await generateAudio(audioText, { voice: 'nova' });
+				blogPost.innerHTML = `
+					<article>
+						<div class="image-container">
+							<img src="${imageUrl}" alt="${title}">
+							<button class="regenerate-image" onclick="regenerateImage('${encodeURIComponent(imagePrompt)}')">
+								<svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+							</button>
+						</div>
+						<h1>${title}</h1>
+						<div class="content">
+							${cleanArticleData.split('\n\n').map(paragraph => 
+								`<p class="blog-paragraph">${paragraph}</p>`
+							).join('')}
+						</div>
+						<div class="audio-controls">
+							<h3>Listen to Description</h3>
+							<audio controls id="description-audio" class="audio-player">
+								<source src="${audioUrl}" type="audio/mpeg" id="audio-source">
+							</audio>
+						</div>
+						<div class="footer">
+							<p>© ${new Date().getFullYear()} Daydreamer Genetics</p>
+							<p>www.daydreamergenetics.com | Instagram: @daydreamergenetics</p>
+						</div>
+						<div class="button-container">
+							<button id="copyButton" class="copy-button">Copy Formatted Post</button>
+						</div>
+					</article>
+				`;
 
-        document.getElementById('copyButton').onclick = copyFormattedPost;
-        
-        document.getElementById('loading').style.display = 'none';
-        blogPost.classList.add('visible');
+				document.getElementById('copyButton').onclick = copyFormattedPost;
+				
+				document.getElementById('loading').style.display = 'none';
+				blogPost.classList.add('visible');
 
-    } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('loading').style.display = 'none';
-        blogPost.innerHTML = '<p>Error generating strain post. Please try again.</p>';
-        blogPost.classList.add('visible');
-    }
-}
+			} catch (error) {
+				console.error('Error:', error);
+				document.getElementById('loading').style.display = 'none';
+				blogPost.innerHTML = '<p>Error generating strain post. Please try again.</p>';
+				blogPost.classList.add('visible');
+			}
+		}
 
-async function generateAudio(text, options = {}) {
-  try {
-    // First, we need to create a prompt that instructs the AI to read verbatim
-    const instructionPrefix = "READ THIS TEXT VERBATIM WITHOUT ANY COMMENTARY OR RESPONSE: ";
-    const textToRead = instructionPrefix + text;
-    const encodedText = encodeURIComponent(textToRead);
-    const voice = options.voice || 'nova';
-    
-    const url = `https://text.pollinations.ai/${encodedText}?model=openai-audio&voice=${voice}`;
-    
-    console.log("Generating audio with URL:", url);
-    return url;
-  } catch (error) {
-    console.error("Audio generation error:", error);
-    return null;
-  }
-}
-
-function regenerateImage(imagePrompt) {
-    const img = document.querySelector('.image-container img');
-    const newSeed = Math.floor(Math.random() * 1000000);
-    const newImageUrl = `https://image.pollinations.ai/prompt/${imagePrompt}?width=800&height=400&nologo=true&model=flux&enhance=true&seed=${newSeed}`;
-    
-    img.style.opacity = '0.5';
-    const newImage = new Image();
-    newImage.onload = () => {
-        img.src = newImageUrl;
-        img.style.opacity = '1';
-    };
-    newImage.src = newImageUrl;
-}
-
-function generatePrompt(concept) {
-    return `Create a brief, appealing strain description for "${concept}" by Daydreamer Genetics.
-            Keep it concise (2-3 short paragraphs maximum).
-            Be authentic and do not make up specific details you cannot know.
-            Focus on the strain name vibe and general cannabis attributes.
-            Format with "TITLE:" at the beginning, followed by the description.
-            The tone should be professional but accessible to cannabis enthusiasts.
-            Do not use any special characters, markdown, or formatting - use plain text only.`;
-}
+		async function generateAudio(text, options = {}) {
+		  try {
+			// First, we need to create a prompt that instructs the AI to read verbatim
+			const instructionPrefix = "READ THIS TEXT VERBATIM WITHOUT ANY COMMENTARY OR RESPONSE: ";
+			const textToRead = instructionPrefix + text;
+			const encodedText = encodeURIComponent(textToRead);
+			const voice = options.voice || 'nova';
+			
+			const url = `https://text.pollinations.ai/${encodedText}?model=openai-audio&voice=${voice}`;
+			
+			console.log("Generating audio with URL:", url);
+			return url;
+		  } catch (error) {
+			console.error("Audio generation error:", error);
+			return null;
+		  }
+		}
 
 		function regenerateImage(imagePrompt) {
 			const img = document.querySelector('.image-container img');
@@ -459,9 +391,7 @@ function generatePrompt(concept) {
 			};
 			newImage.src = newImageUrl;
 		}
-		
-
-		
+				
         function generateRandomPost() {
             document.getElementById('topicInput').value = '';
             generatePost();
