@@ -6,6 +6,7 @@
     <title>AI BRANDING ASSISTANT</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.js"></script>
     <style>
 		:root {
 			--primary-color: #2E7D32;
@@ -745,7 +746,7 @@
             <div class="image-display" id="imageDisplay">
                 <img id="currentImage" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjE1MCIgeT0iMTQwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM2NjY2NjYiPkJyYW5kIExvZ28gRGVzaWduPC90ZXh0Pjx0ZXh0IHg9IjE1MCIgeT0iMTYwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4ODg4ODgiPkRlc2NyaWJlIHlvdXIgYnJhbmQgYW5kIGNsaWNrIEdlbmVyYXRlPC90ZXh0Pjwvc3ZnPg==" alt="Generate a brand design">
             </div>
-            
+           
             <!-- Thumbnail Gallery -->
             <div class="thumbnail-gallery" id="thumbnailGallery">
                 <!-- Thumbnails will be added here -->
@@ -754,7 +755,7 @@
             <div class="image-controls">
                 <div class="options-group">
                     <div class="checkbox-option">
-                        <input type="checkbox" id="enhanceOption" checked>
+                        <input type="checkbox" id="enhanceOption">
                         <label for="enhanceOption">Enhance (improve prompt quality)</label>
                     </div>
                     <div class="checkbox-option">
@@ -1371,6 +1372,48 @@
 				return `${prompt}. ${combinedStyle}`;
 			}
 
+			async function extractPromptFromImage(imageUrl) {
+				try {
+					// Fetch the image as a blob
+					const response = await fetch(imageUrl);
+					const imageBlob = await response.blob();
+					
+					return new Promise((resolve, reject) => {
+						const reader = new FileReader();
+						reader.onload = function(e) {
+							const img = new Image();
+							img.onload = function() {
+								EXIF.getData(img, function() {
+									const allTags = EXIF.getAllTags(this);
+									console.log("All EXIF tags:", allTags);
+									
+									if (allTags.undefined) {  // CHANGED FROM UserComment TO undefined
+										const decoder = new TextDecoder('utf-8');
+										const jsonStr = decoder.decode(new Uint8Array(allTags.undefined)).replace('ASCII\x00\x00\x00', '');
+										console.log("Decoded UserComment:", jsonStr);
+										
+										try {
+											const metadata = JSON.parse(jsonStr);
+											resolve(metadata.prompt || "No prompt found in metadata");
+										} catch (error) {
+											console.error("Error parsing UserComment JSON:", error);
+											reject(`Error parsing metadata: ${error}`);
+										}
+									} else {
+										reject("EXIF metadata not found");  // Updated error message
+									}
+								});
+							};
+							img.src = e.target.result;
+						};
+						reader.readAsDataURL(imageBlob);
+					});
+				} catch (error) {
+					console.error("Error extracting prompt:", error);
+					return "Error extracting prompt: " + error.message;
+				}
+			}
+
 			// Function to send message to AI with better error handling
 			async function sendMessage(message, generateImage = false, retryCount = 0) {
 				// Define userMessage at function level so it's available everywhere in the function
@@ -1540,6 +1583,7 @@
 				
 				// Always apply selected styles to the prompt before generating
 				const enhancedPrompt = applySelectedStylesToPrompt(prompt);
+				console.log("Enhanced prompt with styles:", enhancedPrompt);
 				
 				// Create image URL with parameters
 				const randomSeed = Math.floor(Math.random() * 1000000);
@@ -1584,6 +1628,17 @@
 					
 					// Add to thumbnail gallery
 					addThumbnail(originalImageUrl);
+					
+					// Extract and display the actual prompt that was used
+					try {
+						const actualPrompt = await extractPromptFromImage(imageUrl);
+						// Add the actual prompt to the chat
+						addMessage(`Actual prompt used: "${actualPrompt}"`, false);
+						console.log("Actual prompt used:", actualPrompt);
+					} catch (exifError) {
+						console.error("Failed to extract prompt from image:", exifError);
+						addMessage("Could not extract the actual prompt from the image metadata.", false);
+					}
 					
 					// Add text notification to chat
 					addMessage("Your brand design has been generated in the display area.", false);
