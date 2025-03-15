@@ -329,7 +329,8 @@
 			padding: 0.2rem 0.4rem;
 			border-radius: 4px;
 			font-family: monospace;
-		}        
+		}
+        
         @media (max-width: 768px) {
             .tabs {
                 flex-direction: column;
@@ -480,8 +481,7 @@
 				privacyMessage.innerHTML = `
 					<h3>Private Collection</h3>
 					<p>This seed collection tracker is private.</p>
-					<p>Please use a URL parameter to access a specific collection: <br>
-					<code>?list=collectorname</code> or <code>?list=all</code> to see all collections.</p>
+					<p>Please contact the administrator for access.</p>
 				`;
 				tabContainer.appendChild(privacyMessage);
 				
@@ -590,18 +590,6 @@
 				const tabsContainer = document.querySelector('.tabs');
 				tabsContainer.innerHTML = ''; // Clear existing tabs
 				
-				// Check for query parameter
-				const params = getQueryParams();
-				const listParam = params.list || '';
-				
-				// Create a mapping of normalized names (lowercase, no special chars)
-				const nameMapping = {};
-				sheets.forEach((sheet, index) => {
-					const normalizedName = sheet.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-					nameMapping[normalizedName] = index;
-				});
-				
-				// Add all tabs to DOM
 				sheets.forEach((sheet, index) => {
 					const tabButton = document.createElement('button');
 					tabButton.className = 'tab' + (index === 0 ? ' active' : '');
@@ -611,28 +599,10 @@
 					tabsContainer.appendChild(tabButton);
 				});
 				
-				// Determine which tab to show by default
-				let activeIndex = 0; // Default to first tab
-				
-				if (listParam === 'all') {
-					// Show all tabs (default behavior)
-				} else if (listParam && nameMapping[listParam]) {
-					// If a specific list is requested and exists
-					activeIndex = nameMapping[listParam];
+				// Load the first sheet by default
+				if (sheets.length > 0) {
+					loadSheetData(sheets[0].id, 0);
 				}
-				
-				// Set active tab
-				document.querySelectorAll('.tab').forEach((tab, index) => {
-					tab.classList.toggle('active', index === activeIndex);
-				});
-				
-				// Show active tab content
-				document.querySelectorAll('.tab-content').forEach((content, index) => {
-					content.classList.toggle('active', index === activeIndex);
-				});
-				
-				// Load the active sheet
-				loadSheetData(sheets[activeIndex].id, activeIndex);
 				
 				// Add event listeners to tabs
 				document.querySelectorAll('.tab').forEach(tab => {
@@ -649,7 +619,7 @@
 					});
 				});
 			}
-
+			
 			function getQueryParams() {
 				const params = {};
 				const queryString = window.location.search.substring(1);
