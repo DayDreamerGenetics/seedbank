@@ -95,6 +95,10 @@
             display: block;
         }
         
+        .sheet-content {
+            margin-top: 1rem;
+        }
+        
         .seed-list {
             list-style: none;
         }
@@ -198,8 +202,75 @@
             color: var(--cannabis-dark-green);
         }
         
+        .placeholder-message {
+            padding: 2rem;
+            text-align: center;
+            color: #666;
+        }
+        
+        .placeholder-message h3 {
+            color: var(--cannabis-dark-green);
+            margin-bottom: 1rem;
+        }
+        
+        .placeholder-message ol {
+            text-align: left;
+            max-width: 500px;
+            margin: 1rem auto;
+            padding-left: 2rem;
+        }
+        
+        .placeholder-message ol li {
+            margin-bottom: 0.5rem;
+        }
+        
         .form-group {
             margin-bottom: 1rem;
+        }
+        
+        .search-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            background-color: var(--cannabis-green);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-btn {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn.active {
+            background-color: var(--cannabis-purple);
+            color: white;
         }
         
         label {
@@ -262,19 +333,82 @@
 </head>
 <body>
     <header>
-        <h1>ᵗʰᵉ Rev™ Seeds Banked</h1>
-        <div class="subtitle">Real-time cannabis seed collection tracking</div>
+        <h1>Daydreamer Genetics</h1>
+        <div class="subtitle">Seed Collection Collaborative</div>
     </header>
     
     <div class="container">
         <div class="tab-container">
             <div class="tabs">
                 <button class="tab active" data-sheet-id="1A7kFjfw6cjmQQOwz-5liWVGgFK0K5lwS8AfIZ_Zthbg">ᵗʰᵉ Rev™</button>
+                <button class="tab" data-sheet-id="placeholder1">Breeder 2</button>
+                <button class="tab" data-sheet-id="placeholder2">Breeder 3</button>
+                <button class="tab" data-sheet-id="placeholder3">Breeder 4</button>
                 <!-- Additional tabs will be added dynamically -->
             </div>
             
-            <div id="sheet-content" class="tab-content active">
-                <div class="loader"></div>
+            <div class="tab-content active">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search seeds by name, breeder, etc.">
+                    <button class="search-btn">Search</button>
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="reg">REG</button>
+                    <button class="filter-btn" data-filter="fem">FEM</button>
+                    <button class="filter-btn" data-filter="auto">AUTO</button>
+                </div>
+                <div id="sheet-content-0" class="sheet-content">
+                    <div class="loader"></div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search seeds by name, breeder, etc.">
+                    <button class="search-btn">Search</button>
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="reg">REG</button>
+                    <button class="filter-btn" data-filter="fem">FEM</button>
+                    <button class="filter-btn" data-filter="auto">AUTO</button>
+                </div>
+                <div id="sheet-content-1" class="sheet-content">
+                    <div class="loader"></div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search seeds by name, breeder, etc.">
+                    <button class="search-btn">Search</button>
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="reg">REG</button>
+                    <button class="filter-btn" data-filter="fem">FEM</button>
+                    <button class="filter-btn" data-filter="auto">AUTO</button>
+                </div>
+                <div id="sheet-content-2" class="sheet-content">
+                    <div class="loader"></div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search seeds by name, breeder, etc.">
+                    <button class="search-btn">Search</button>
+                </div>
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="reg">REG</button>
+                    <button class="filter-btn" data-filter="fem">FEM</button>
+                    <button class="filter-btn" data-filter="auto">AUTO</button>
+                </div>
+                <div id="sheet-content-3" class="sheet-content">
+                    <div class="loader"></div>
+                </div>
             </div>
         </div>
         
@@ -293,7 +427,7 @@
     </div>
     
     <footer>
-        &copy; 2025 Cannabis Seeds Tracker | Update your seed collection in Google Sheets and see changes in real-time
+        &copy; 2025 Daydreamer Genetics | Collaborative Seed Collection Tracker
     </footer>
     
     <script>
@@ -303,6 +437,18 @@
                 {
                     id: '1A7kFjfw6cjmQQOwz-5liWVGgFK0K5lwS8AfIZ_Zthbg',
                     name: 'ᵗʰᵉ Rev™'
+                },
+                {
+                    id: 'placeholder1',
+                    name: 'Breeder 2'
+                },
+                {
+                    id: 'placeholder2',
+                    name: 'Breeder 3'
+                },
+                {
+                    id: 'placeholder3',
+                    name: 'Breeder 4'
                 }
             ];
             
@@ -333,7 +479,13 @@
                 document.querySelectorAll('.tab').forEach(tab => {
                     tab.addEventListener('click', function() {
                         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
                         this.classList.add('active');
+                        
+                        // Show the content for this tab
+                        const tabIndex = Array.from(document.querySelectorAll('.tab')).indexOf(this);
+                        document.querySelectorAll('.tab-content')[tabIndex].classList.add('active');
+                        
                         loadSheetData(this.dataset.sheetId);
                     });
                 });
@@ -341,11 +493,30 @@
             
             // Load data from Google Sheet
             function loadSheetData(sheetId) {
-                const contentContainer = document.getElementById('sheet-content');
+                // Find the active tab index
+                const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => tab.classList.contains('active'));
+                const contentContainer = document.getElementById(`sheet-content-${activeTabIndex}`);
                 contentContainer.innerHTML = '<div class="loader"></div>';
                 
                 // Google Sheets API URL to export as CSV
                 const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+                
+                // Check if this is a placeholder tab
+                if (sheetId.startsWith('placeholder')) {
+                    contentContainer.innerHTML = `
+                        <div class="placeholder-message">
+                            <h3>Breeder Collection Placeholder</h3>
+                            <p>This is a placeholder for a future seed collection. To add a real collection:</p>
+                            <ol>
+                                <li>Have the breeder create a Google Sheet with their seed inventory</li>
+                                <li>Make sure the sheet is shared publicly (viewable by anyone with the link)</li>
+                                <li>Use the form below to add their collection to this tracker</li>
+                            </ol>
+                            <p>Once added, this tab will automatically display their seed collection.</p>
+                        </div>
+                    `;
+                    return;
+                }
                 
                 fetch(csvUrl)
                     .then(response => {
@@ -384,6 +555,13 @@
                     
                     const values = lines[i].split(',');
                     const entry = {};
+                    
+                    // Skip if this appears to be an empty row or just contains column headers
+                    if (values.length < 2 || !values[0].trim()) continue;
+                    
+                    // Skip if this is the header row being repeated (common in some sheets)
+                    if (values[0].trim().toUpperCase() === 'STRAIN' || 
+                        values[0].trim() === 'Unnamed Seed') continue;
                     
                     for (let j = 0; j < headers.length; j++) {
                         entry[headers[j]] = values[j] ? values[j].trim() : '';
@@ -465,6 +643,54 @@
                 contentContainer.innerHTML = html;
             }
             
+            // Set up search functionality
+            document.querySelectorAll('.search-btn').forEach((btn, index) => {
+                btn.addEventListener('click', function() {
+                    const searchInput = document.querySelectorAll('.search-input')[index];
+                    const searchTerm = searchInput.value.trim().toLowerCase();
+                    
+                    // Get all seed items in this tab content
+                    const seedItems = document.querySelectorAll(`.tab-content:nth-child(${index + 1}) .seed-item`);
+                    
+                    seedItems.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        if (searchTerm === '' || text.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Set up filter functionality
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Get the parent tab content
+                    const tabContent = this.closest('.tab-content');
+                    
+                    // Update active button
+                    tabContent.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.dataset.filter;
+                    const seedItems = tabContent.querySelectorAll('.seed-item');
+                    
+                    seedItems.forEach(item => {
+                        if (filter === 'all') {
+                            item.style.display = '';
+                        } else {
+                            const seedType = item.querySelector('.seed-details').textContent.toLowerCase();
+                            if (seedType.includes(filter.toLowerCase())) {
+                                item.style.display = '';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+            
             // Add new sheet from form
             document.getElementById('add-sheet-btn').addEventListener('click', function() {
                 const nameInput = document.getElementById('sheet-name');
@@ -487,8 +713,16 @@
                 
                 const id = match[1];
                 
-                // Add new sheet to the list
-                sheets.push({ id, name });
+                // Replace a placeholder with the new sheet
+                const placeholderIndex = sheets.findIndex(sheet => sheet.id.startsWith('placeholder'));
+                
+                if (placeholderIndex !== -1) {
+                    sheets[placeholderIndex] = { id, name };
+                } else {
+                    // If no placeholders, add to the end
+                    sheets.push({ id, name });
+                }
+                
                 saveSheets();
                 
                 // Reinitialize tabs
