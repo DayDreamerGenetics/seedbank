@@ -310,7 +310,26 @@
             color: #666;
             font-size: 0.9rem;
         }
-        
+
+		.privacy-message, .error-message {
+			padding: 3rem;
+			text-align: center;
+			background-color: white;
+			border-radius: 8px;
+			margin: 2rem;
+		}
+
+		.privacy-message h3, .error-message h3 {
+			color: var(--cannabis-dark-green);
+			margin-bottom: 1.5rem;
+		}
+
+		.privacy-message code, .error-message code {
+			background: #f0f0f0;
+			padding: 0.2rem 0.4rem;
+			border-radius: 4px;
+			font-family: monospace;
+		}        
         @media (max-width: 768px) {
             .tabs {
                 flex-direction: column;
@@ -439,6 +458,107 @@
     </footer>
     
     <script>
+	// Add this at the top of your script section
+	function initializeWithQueryParams() {
+		// Parse URL query parameters
+		const queryString = window.location.search.substring(1);
+		const urlParams = new URLSearchParams(queryString);
+		const listParam = urlParams.get('list')?.toLowerCase();
+		
+		// If no list parameter or it's not "all", hide all tabs initially
+		if (!listParam) {
+			document.addEventListener('DOMContentLoaded', function() {
+				// Hide all tabs and content by default - show a "privacy" message instead
+				document.querySelectorAll('.tab-content').forEach(content => {
+					content.classList.remove('active');
+				});
+				
+				// Add a privacy message to explain how to use the page
+				const tabContainer = document.querySelector('.tab-container');
+				const privacyMessage = document.createElement('div');
+				privacyMessage.className = 'privacy-message';
+				privacyMessage.innerHTML = `
+					<h3>Private Collection</h3>
+					<p>This seed collection tracker is private.</p>
+					<p>Please use a URL parameter to access a specific collection: <br>
+					<code>?list=collectorname</code> or <code>?list=all</code> to see all collections.</p>
+				`;
+				tabContainer.appendChild(privacyMessage);
+				
+				// Hide the tabs
+				document.querySelector('.tabs').style.display = 'none';
+			});
+			return;
+		}
+		
+		// For "all" parameter, show everything normally
+		if (listParam === 'all') {
+			return;
+		}
+		
+		// For specific collector, show only their tab
+		document.addEventListener('DOMContentLoaded', function() {
+			setTimeout(() => {
+				// Find the matching tab
+				let foundIndex = -1;
+				
+				// Try to match by normalized name
+				sheets.forEach((sheet, index) => {
+					const normalizedName = sheet.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+					if (normalizedName === listParam.replace(/[^a-z0-9]/g, '')) {
+						foundIndex = index;
+					}
+				});
+				
+				// If we found a matching tab, click it and hide the others
+				if (foundIndex >= 0) {
+					// Hide all tabs in the navigation except the matching one
+					document.querySelectorAll('.tab').forEach((tab, index) => {
+						if (index !== foundIndex) {
+							tab.style.display = 'none';
+						} else {
+							tab.classList.add('active');
+						}
+					});
+					
+					// Show only the matching tab content
+					document.querySelectorAll('.tab-content').forEach((content, index) => {
+						if (index === foundIndex) {
+							content.classList.add('active');
+						} else {
+							content.classList.remove('active');
+						}
+					});
+					
+					// Load the data for this tab
+					loadSheetData(sheets[foundIndex].id, foundIndex);
+				} else {
+					// No matching collector found
+					document.querySelectorAll('.tab-content').forEach(content => {
+						content.classList.remove('active');
+					});
+					
+					// Show error message
+					const tabContainer = document.querySelector('.tab-container');
+					const errorMessage = document.createElement('div');
+					errorMessage.className = 'error-message';
+					errorMessage.innerHTML = `
+						<h3>Collector Not Found</h3>
+						<p>The collector "${listParam}" was not found.</p>
+						<p>Try using <code>?list=all</code> to see all available collectors.</p>
+					`;
+					tabContainer.appendChild(errorMessage);
+					
+					// Hide the tabs
+					document.querySelector('.tabs').style.display = 'none';
+				}
+			}, 100);
+		});
+	}
+
+	// Call this function immediately
+	initializeWithQueryParams();	
+	
         document.addEventListener('DOMContentLoaded', function() {
             // Store sheets in localStorage to persist between sessions
 			let sheets = JSON.parse(localStorage.getItem('sheets')) || [
