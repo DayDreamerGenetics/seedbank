@@ -556,8 +556,7 @@
 		});
 	}
 
-	// Call this function immediately
-	initializeWithQueryParams();	
+	
 	
         document.addEventListener('DOMContentLoaded', function() {
             // Store sheets in localStorage to persist between sessions
@@ -973,6 +972,8 @@
             
             // Initialize the app
             initializeTabs();
+			
+			initializeWithQueryParams();
         });
     </script>
 </body>
