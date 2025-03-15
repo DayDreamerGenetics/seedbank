@@ -466,39 +466,84 @@
             }
             
             // Initialize tabs for all saved sheets
-            function initializeTabs() {
-                const tabsContainer = document.querySelector('.tabs');
-                tabsContainer.innerHTML = ''; // Clear existing tabs
-                
-                sheets.forEach((sheet, index) => {
-                    const tabButton = document.createElement('button');
-                    tabButton.className = 'tab' + (index === 0 ? ' active' : '');
-                    tabButton.textContent = sheet.name;
-                    tabButton.dataset.sheetId = sheet.id;
-                    tabButton.dataset.index = index;
-                    tabsContainer.appendChild(tabButton);
-                });
-                
-                // Load the first sheet by default
-                if (sheets.length > 0) {
-                    loadSheetData(sheets[0].id, 0);
-                }
-                
-                // Add event listeners to tabs
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.addEventListener('click', function() {
-                        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        // Show the content for this tab
-                        const tabIndex = parseInt(this.dataset.index);
-                        document.querySelectorAll('.tab-content')[tabIndex].classList.add('active');
-                        
-                        loadSheetData(this.dataset.sheetId, tabIndex);
-                    });
-                });
-            }
+			function initializeTabs() {
+				const tabsContainer = document.querySelector('.tabs');
+				tabsContainer.innerHTML = ''; // Clear existing tabs
+				
+				// Check for query parameter
+				const params = getQueryParams();
+				const listParam = params.list || '';
+				
+				// Create a mapping of normalized names (lowercase, no special chars)
+				const nameMapping = {};
+				sheets.forEach((sheet, index) => {
+					const normalizedName = sheet.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+					nameMapping[normalizedName] = index;
+				});
+				
+				// Add all tabs to DOM
+				sheets.forEach((sheet, index) => {
+					const tabButton = document.createElement('button');
+					tabButton.className = 'tab' + (index === 0 ? ' active' : '');
+					tabButton.textContent = sheet.name;
+					tabButton.dataset.sheetId = sheet.id;
+					tabButton.dataset.index = index;
+					tabsContainer.appendChild(tabButton);
+				});
+				
+				// Determine which tab to show by default
+				let activeIndex = 0; // Default to first tab
+				
+				if (listParam === 'all') {
+					// Show all tabs (default behavior)
+				} else if (listParam && nameMapping[listParam]) {
+					// If a specific list is requested and exists
+					activeIndex = nameMapping[listParam];
+				}
+				
+				// Set active tab
+				document.querySelectorAll('.tab').forEach((tab, index) => {
+					tab.classList.toggle('active', index === activeIndex);
+				});
+				
+				// Show active tab content
+				document.querySelectorAll('.tab-content').forEach((content, index) => {
+					content.classList.toggle('active', index === activeIndex);
+				});
+				
+				// Load the active sheet
+				loadSheetData(sheets[activeIndex].id, activeIndex);
+				
+				// Add event listeners to tabs
+				document.querySelectorAll('.tab').forEach(tab => {
+					tab.addEventListener('click', function() {
+						document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+						document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+						this.classList.add('active');
+						
+						// Show the content for this tab
+						const tabIndex = parseInt(this.dataset.index);
+						document.querySelectorAll('.tab-content')[tabIndex].classList.add('active');
+						
+						loadSheetData(this.dataset.sheetId, tabIndex);
+					});
+				});
+			}
+
+			function getQueryParams() {
+				const params = {};
+				const queryString = window.location.search.substring(1);
+				const pairs = queryString.split('&');
+				
+				for (const pair of pairs) {
+					const [key, value] = pair.split('=');
+					if (key && value) {
+						params[key.toLowerCase()] = decodeURIComponent(value.toLowerCase());
+					}
+				}
+				
+				return params;
+			}
             
             // Load data from Google Sheet
             function loadSheetData(sheetId, tabIndex) {
