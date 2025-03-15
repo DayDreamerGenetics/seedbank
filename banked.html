@@ -467,12 +467,13 @@
                     tabButton.className = 'tab' + (index === 0 ? ' active' : '');
                     tabButton.textContent = sheet.name;
                     tabButton.dataset.sheetId = sheet.id;
+                    tabButton.dataset.index = index;
                     tabsContainer.appendChild(tabButton);
                 });
                 
                 // Load the first sheet by default
                 if (sheets.length > 0) {
-                    loadSheetData(sheets[0].id);
+                    loadSheetData(sheets[0].id, 0);
                 }
                 
                 // Add event listeners to tabs
@@ -483,19 +484,17 @@
                         this.classList.add('active');
                         
                         // Show the content for this tab
-                        const tabIndex = Array.from(document.querySelectorAll('.tab')).indexOf(this);
+                        const tabIndex = parseInt(this.dataset.index);
                         document.querySelectorAll('.tab-content')[tabIndex].classList.add('active');
                         
-                        loadSheetData(this.dataset.sheetId);
+                        loadSheetData(this.dataset.sheetId, tabIndex);
                     });
                 });
             }
             
             // Load data from Google Sheet
-            function loadSheetData(sheetId) {
-                // Find the active tab index
-                const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => tab.classList.contains('active'));
-                const contentContainer = document.getElementById(`sheet-content-${activeTabIndex}`);
+            function loadSheetData(sheetId, tabIndex) {
+                const contentContainer = document.getElementById(`sheet-content-${tabIndex}`);
                 contentContainer.innerHTML = '<div class="loader"></div>';
                 
                 // Google Sheets API URL to export as CSV
@@ -527,7 +526,7 @@
                     })
                     .then(csv => {
                         const seeds = parseCSV(csv);
-                        displaySeeds(seeds);
+                        displaySeeds(seeds, tabIndex);
                     })
                     .catch(error => {
                         console.error('Error loading sheet data:', error);
@@ -574,8 +573,8 @@
             }
             
             // Display seeds in the content container
-            function displaySeeds(seeds) {
-                const contentContainer = document.getElementById('sheet-content');
+            function displaySeeds(seeds, tabIndex) {
+                const contentContainer = document.getElementById(`sheet-content-${tabIndex}`);
                 
                 if (seeds.length === 0) {
                     contentContainer.innerHTML = '<p>No seeds found in this collection.</p>';
@@ -733,11 +732,8 @@
                 urlInput.value = '';
                 
                 // Switch to the newly added tab
-                document.querySelectorAll('.tab').forEach(tab => {
-                    if (tab.dataset.sheetId === id) {
-                        tab.click();
-                    }
-                });
+                const newTabIndex = placeholderIndex !== -1 ? placeholderIndex : sheets.length - 1;
+                document.querySelectorAll('.tab')[newTabIndex].click();
             });
             
             // Initialize the app
