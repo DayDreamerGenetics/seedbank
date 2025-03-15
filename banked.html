@@ -640,27 +640,84 @@
                 
                 html += '</ul>';
                 contentContainer.innerHTML = html;
+				
+				// Refresh event handlers after updating content
+				refreshEventHandlers();				
             }
+
+			function performSearch(tabIndex) {
+				const searchInput = document.querySelectorAll('.search-input')[tabIndex];
+				const searchTerm = searchInput.value.trim().toLowerCase();
+				const tabContent = document.querySelectorAll('.tab-content')[tabIndex];
+				
+				// Get all seed items in this tab content
+				const seedItems = tabContent.querySelectorAll('.seed-item');
+				
+				seedItems.forEach(item => {
+					const text = item.textContent.toLowerCase();
+					if (searchTerm === '' || text.includes(searchTerm)) {
+						item.style.display = '';
+					} else {
+						item.style.display = 'none';
+					}
+				});
+			}
+
+			function filterSeeds(button) {
+				// Get the parent tab content
+				const tabContent = button.closest('.tab-content');
+				
+				// Update active button
+				tabContent.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+				button.classList.add('active');
+				
+				const filter = button.dataset.filter;
+				const seedItems = tabContent.querySelectorAll('.seed-item');
+				
+				seedItems.forEach(item => {
+					const seedDetails = item.querySelector('.seed-details');
+					
+					if (filter === 'all') {
+						item.style.display = '';
+					} else if (seedDetails) {
+						const seedType = seedDetails.textContent.toLowerCase();
+						if (seedType.includes(filter.toLowerCase())) {
+							item.style.display = '';
+						} else {
+							item.style.display = 'none';
+						}
+					}
+				});
+			}
+
+			function setupFilterButtons() {
+				document.querySelectorAll('.filter-btn').forEach(btn => {
+					btn.addEventListener('click', function() {
+						filterSeeds(this);
+					});
+				});
+			}
             
-            // Set up search functionality
-            document.querySelectorAll('.search-btn').forEach((btn, index) => {
-                btn.addEventListener('click', function() {
-                    const searchInput = document.querySelectorAll('.search-input')[index];
-                    const searchTerm = searchInput.value.trim().toLowerCase();
-                    
-                    // Get all seed items in this tab content
-                    const seedItems = document.querySelectorAll(`.tab-content:nth-child(${index + 1}) .seed-item`);
-                    
-                    seedItems.forEach(item => {
-                        const text = item.textContent.toLowerCase();
-                        if (searchTerm === '' || text.includes(searchTerm)) {
-                            item.style.display = '';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            });
+			// Set up search functionality
+			document.querySelectorAll('.search-btn').forEach((btn, index) => {
+				btn.addEventListener('click', function() {
+					const tabContent = document.querySelectorAll('.tab-content')[index];
+					const searchInput = tabContent.querySelector('.search-input');
+					const searchTerm = searchInput.value.trim().toLowerCase();
+					
+					// Get all seed items in this tab content
+					const seedItems = tabContent.querySelectorAll('.seed-item');
+					
+					seedItems.forEach(item => {
+						const text = item.textContent.toLowerCase();
+						if (searchTerm === '' || text.includes(searchTerm)) {
+							item.style.display = '';
+						} else {
+							item.style.display = 'none';
+						}
+					});
+				});
+			});
             
             // Set up filter functionality
             document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -735,6 +792,41 @@
                 const newTabIndex = placeholderIndex !== -1 ? placeholderIndex : sheets.length - 1;
                 document.querySelectorAll('.tab')[newTabIndex].click();
             });
+			
+			function refreshEventHandlers() {
+				// Set up search functionality for currently active tab
+				const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => 
+					tab.classList.contains('active'));
+					
+				if (activeTabIndex >= 0) {
+					const searchBtn = document.querySelectorAll('.search-btn')[activeTabIndex];
+					const searchInput = document.querySelectorAll('.search-input')[activeTabIndex];
+					
+					if (searchBtn) {
+						searchBtn.addEventListener('click', function() {
+							performSearch(activeTabIndex);
+						});
+					}
+					
+					if (searchInput) {
+						searchInput.addEventListener('keyup', function(event) {
+							if (event.key === 'Enter') {
+								performSearch(activeTabIndex);
+							}
+						});
+					}
+					
+					// Set up filter buttons for active tab
+					const activeTabContent = document.querySelectorAll('.tab-content')[activeTabIndex];
+					if (activeTabContent) {
+						activeTabContent.querySelectorAll('.filter-btn').forEach(btn => {
+							btn.addEventListener('click', function() {
+								filterSeeds(this);
+							});
+						});
+					}
+				}
+			}			
             
             // Initialize the app
             initializeTabs();
